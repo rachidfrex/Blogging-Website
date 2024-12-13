@@ -2,48 +2,124 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/home-style.css">
-    <link rel="stylesheet" href="css/compose-style.css">
-    
+    <title>Create New Post - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
 </head>
-<body>
-     <nav>
-        <div class="logo"><a href="/home">myBlog</a></div>
-        <div class="nav-items">
-            <ul>
-                <li> <a href="/home"> Home</a></li>
-                <% if(user==="admin"){ %>
-                <li> <a href="/admin">Dashboard</a></li>
-                <% }else{%>
-                    <li> <a href="/profile/<%=user %>"> My profile</a></li>
-                    <% }%>
-                <li> <a href="/logout"> Logout</a></li>
-            </ul>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-teal-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/home" class="text-white text-2xl font-bold">myBlog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/home" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <% if(user==="admin"){ %>
+                        <a href="/admin" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <% } else { %>
+                        <a href="/profile/<%=user %>" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">My Profile</a>
+                    <% } %>
+                    <a href="/logout" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
         </div>
     </nav>
-    <main>
-        <div class="comp-title-container">
-            <h1 class="title">Create New Post</h1>
-        </div>
-        <div class="post-textarea">
-            <form action="/compose" method="post" enctype="multipart/form-data">
-            <p class="post-title">
-                <input type="text" placeholder="Title" name="postTitle">
-            </p>
-            <p class="post-content">
-                <textarea cols="30" rows="20" name="postBody"></textarea>
-            </p>
-                <input type="file" class="custom-file-input" name="image">
-            </p>
-            <p class="submit-button">
-                <input type="submit" value="Publish">
-                <input type="reset" value="Discard">
-            </p>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-2xl shadow-lg  overflow-hidden">
+
+            <!-- Header -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-900">Create New Post</h1>
+                <p class="mt-1 text-sm text-gray-600">Share your thoughts with the world</p>
+            </div>
+            <!-- Banner Image Preview -->
+            <div class="relative h-[300px]  border-dashed border-teal-500 mx-5 rounded-md border-2  overflow-hidden">
+                <img id="banner-preview" 
+                     src="/images/default-image.png" 
+                     alt="Banner preview"
+                     class="w-full h-full object-cover">
+                <div class="absolute inset-0  flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="relative group cursor-pointer">
+                            <input type="file" 
+                                   name="image" 
+                                   id="image-input"
+                                   accept="image/*"
+                                   class="hidden"
+                                   onchange="previewImage(this)"
+                                   form="post-form">
+                            <label for="image-input" 
+                                   class="inline-flex items-center px-6 py-3 border-2 border-white text-white rounded-lg hover:bg-white/20 transition-all cursor-pointer group-hover:scale-105">
+                                <i class="fa-solid fa-camera mr-2"></i>
+                                Choose Cover Image
+                            </label>
+                        </div>
+                        <p class="mt-2 text-sm text-white/80">Recommended size: 1200x400 pixels</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="post-form" action="/compose" method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+                <!-- Title Input -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Post Title</label>
+                    <input type="text" 
+                           name="postTitle" 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                           placeholder="Enter your post title">
+                </div>
+
+                <!-- Content Input -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Post Content</label>
+                    <textarea name="postBody" 
+                              rows="12"
+                              class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                              placeholder="Write your post content here..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <button type="reset" 
+                            class="px-6 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                        Discard
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors">
+                        Publish Post
+                    </button>
+                </div>
             </form>
         </div>
     </main>
+
+    <script>
+    function previewImage(input) {
+        const preview = document.getElementById('banner-preview');
+        const file = input.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                
+                // Add fade-in animation
+                preview.style.opacity = '0';
+                preview.style.transition = 'opacity 0.3s ease-in-out';
+                setTimeout(() => {
+                    preview.style.opacity = '1';
+                }, 100);
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '/images/default-image.png';
+        }
+    }
+    </script>
 </body>
 </html>

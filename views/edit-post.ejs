@@ -2,48 +2,111 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit post</title>
-    <link rel="stylesheet" href="/css/home-style.css">
-    <link rel="stylesheet" href="/css/compose-style.css">
-    
+    <title>Edit Post - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
 </head>
-<body>
-     <nav>
-        <div class="logo"><a href="/home">myBlog</a></div>
-        <div class="nav-items">
-            <ul>
-                <li> <a href="/home"> Home</a></li>
-                <% if(user==="admin"){ %>
-                <li> <a href="/admin">Dashboard</a></li>
-                <% }else{%>
-                    <li> <a href="/profile/<%=user %>"> My profile</a></li>
-                    <% }%>
-                <li> <a href="/logout"> Logout</a></li>
-            </ul>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-teal-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/home" class="text-white text-2xl font-bold">myBlog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/home" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <% if(user==="admin"){ %>
+                        <a href="/admin" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <% } else { %>
+                        <a href="/profile/<%=user %>" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">My Profile</a>
+                    <% } %>
+                    <a href="/logout" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
         </div>
     </nav>
-    <main>
-        <div class="comp-title-container">
-            <h1 class="title">Edit Post</h1>
-        </div>
-        <div class="post-textarea">
-            <form action="/update/<%=post._id%>" method="post" enctype="multipart/form-data">
-            <p class="post-title">
-                <input type="text" placeholder="Title" name="postTitle" value="<%=post.title%>">
-            </p>
-            <p class="post-content">
-                <textarea cols="30" rows="20" name="postBody"><%=post.content%></textarea>
-            </p>
-                <input type="file" class="custom-file-input" name="image">
-            </p>
-            <p class="submit-button">
-                <input type="submit" value="update">
-                <input type="reset" value="Discard">
-            </p>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <!-- Header -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-900">Edit Post</h1>
+                <p class="mt-1 text-sm text-gray-600">Update your post content and media</p>
+            </div>
+
+            <!-- Form -->
+            <form action="/update/<%=post._id%>" method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+                <!-- Title -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Post Title</label>
+                    <input type="text" 
+                           name="postTitle" 
+                           value="<%=post.title%>"
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                           placeholder="Enter post title">
+                </div>
+
+                <!-- Content -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Post Content</label>
+                    <textarea name="postBody" 
+                              rows="12"
+                              class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"
+                              placeholder="Write your post content here..."><%=post.content%></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Featured Image</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-32 h-32 rounded-lg overflow-hidden bg-gray-100">
+                            <img id="preview-image" 
+                                 src="/thumbnails/<%= post.thumbnail %>" 
+                                 alt="Post thumbnail"
+                                 class="w-full h-full object-cover"
+                                 onerror="this.src='/images/default-image.png'">
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" 
+                                   name="image"
+                                   accept="image/*"
+                                   onchange="previewImage(this)"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"/>
+                            <p class="mt-2 text-xs text-gray-500">Recommended size: 1200x800 pixels</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                    <button type="reset" 
+                            class="px-6 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                        Discard Changes
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors">
+                        Update Post
+                    </button>
+                </div>
             </form>
         </div>
     </main>
+
+    <script>
+    function previewImage(input) {
+        const preview = document.getElementById('preview-image');
+        const file = input.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+    </script>
 </body>
 </html>
