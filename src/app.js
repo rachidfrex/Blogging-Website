@@ -37,6 +37,7 @@ app.use(
   })
 );
 
+
 const visitSchema = new mongoose.Schema({
   visits: Number
 });
@@ -76,40 +77,36 @@ app.get("/signup",(req,res)=>{
   res.redirect("/")
 })
 app.post("/signup", async (req, res) => {
+  try {
+    const userExists = await Profile.exists({ username: req.body.name });
+    
+    if(!userExists) {
+      const profileData = {
+        username: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        type: "user",
+        fullname: req.body.name,
+        dp: "",
+        bio: "",
+        weblink: "",
+        facebook: "",
+        whatsapp: "",
+        twitter: "",
+        instagram: "",
+        phoneno: "",
+      };
 
-  const userExists = await Profile.exists({ username:req.body.name });
-  // const loginData = {
-  //   name: req.body.name,
-  //   email: req.body.email,
-  //   password: req.body.password,
-  //   type: "user",
-  // };
-  if(!userExists){
-  const profileData = {
-    username: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    type: "user",
-    fullname:req.body.name,
-    dp: "",
-    bio: "",
-    weblink: "",
-    facebook: "",
-    whatsapp: "",
-    twitter: "",
-    instagram: "",
-    phoneno: "",
-  };
-
-  // await collection.insertMany(loginData);
-  await Profile.insertMany(profileData)
-  req.session.useremail = req.body.email;
-  req.session.username = req.body.name;
-  res.redirect("home");
-}else{
-  res.send("<script>alert('user already exits');window.location.href = '/'</script>");
-
-}
+      await Profile.insertMany(profileData);
+      req.session.useremail = req.body.email;
+      req.session.username = req.body.name;
+      res.redirect("home");
+    } else {
+      res.render("login", { error: "Username already exists" });
+    }
+  } catch (err) {
+    res.render("login", { error: "Error creating account" });
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -129,14 +126,13 @@ app.post("/login", async (req, res) => {
         req.session.useremail = check.email;
         req.session.username = check.username;
         req.session.type = "user"
-        console.log(req.session.user);
         res.redirect("home");
       }
     } else {
-      res.send("<script>alert('Wrong Password');window.location.href = '/'</script>");
+      res.render("login", { error: "Invalid password" });
     }
   } catch {
-    res.send("<script>alert('Wrong details');window.location.href = '/'</script>");
+    res.render("login", { error: "Invalid email or password" });
   }
 });
 
@@ -157,19 +153,52 @@ app.post("/compose", upload.single("image"), async (req, res) => {
   await PosT.insertMany(postData);
   res.redirect("/home");
 });
+
+// app.get("/posts/:custom", (req, res) => {
+//    if(req.session.username){
+//   PosT.find((err, results) => {
+//     res.render("posts", {
+//       user: req.session.username,
+//       posts: results,
+//       date: Date.now(),
+//       id: req.params.custom,
+//     });
+//   });
+// }else{
+//   res.render("notfound")
+// }
+// });
 app.get("/posts/:custom", (req, res) => {
-   if(req.session.username){
-  PosT.find((err, results) => {
-    res.render("posts", {
-      user: req.session.username,
-      posts: results,
-      date: Date.now(),
-      id: req.params.custom,
+  if(req.session.username){
+    PosT.find().exec((err, allPosts) => {
+      if (err) {
+        console.error(err);
+        return res.render("error", { error: "Error loading posts" });
+      }
+      
+      // Find the current post
+      const currentPost = allPosts.find(p => p._id == req.params.custom);
+      
+      if (!currentPost) {
+        return res.render("notfound");
+      }
+
+      // Get related posts (excluding current post)
+      const relatedPosts = allPosts
+        .filter(p => p._id != req.params.custom)
+        .slice(0, 5); // Get only 5 related posts
+
+      res.render("posts", {
+        user: req.session.username,
+        currentPost: currentPost,
+        relatedPosts: relatedPosts,
+        date: Date.now(),
+        id: req.params.custom
+      });
     });
-  });
-}else{
-  res.render("notfound")
-}
+  } else {
+    res.render("notfound");
+  }
 });
 app.post("/posts/:custom", (req, res) => {
   const id = req.params.custom;
@@ -398,19 +427,42 @@ app.get("/removeuser/:custom", (req, res) => {
 
 
 
-app.post("/search",async(req,res)=>{
-  let payload=req.body.payload.trim()
-  // console.log(payload);
-  let search=await PosT.find({title:{$regex: new RegExp('^'+payload+'.*','i')}}).exec();
-  search = search.slice(0,10)
-  // console.log(search);
-  res.send({payload:search})
+// app.post("/search",async(req,res)=>{
+//   let payload=req.body.payload.trim()
+//   // console.log(payload);
+//   let search=await PosT.find({title:{$regex: new RegExp('^'+payload+'.*','i')}}).exec();
+//   search = search.slice(0,10)
+//   // console.log(search);
+//   res.send({payload:search})
 
-})
-
-app.get("/:custom", (req, res) => {
-  res.render("notfound")
+// })
+app.post("/search", async (req, res) => {
+  try {
+    let payload = req.body.payload.trim();
+    // Search in both title and content
+    let search = await PosT.find({
+      $or: [
+        { title: { $regex: new RegExp('.*' + payload + '.*', 'i') } },
+        { content: { $regex: new RegExp('.*' + payload + '.*', 'i') } }
+      ]
+    }).exec();
+    
+    search = search.slice(0, 10); // Limit results to 10
+    res.send({ payload: search });
+  } catch (err) {
+    console.error(err);
+    res.send({ payload: [] });
+  }
 });
+
+app.get("/test", (req, res) => {
+  res.render("test");
+});
+
+app.get('/test', (req, res) => {
+  res.send('Test route is working!');
+});
+
 app.get("/:custom/:custom2",(req,res)=>{
   res.render("notfound")
 })

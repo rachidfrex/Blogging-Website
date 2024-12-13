@@ -1,146 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>posts</title>
-    <link rel="stylesheet" href="/css/home-style.css" />
-    <link rel="stylesheet" href="/css/post-style.css" />
-    <script src="https://kit.fontawesome.com/eabac940d1.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <nav>
-      <div class="logo"><a href="/home">myBlog</a></div>
-      <div class="nav-items">
-        <ul>
-          <li><a href="/home"> Home</a></li>
-          <% if(user==="admin"){ %>
-                <li> <a href="/admin">Dashboard</a></li>
-                <% }else{%>
-                    <li> <a href="/profile/<%=user %>"> My profile</a></li>
-                    <% }%>
-          <li><a href="/logout"> Logout</a></li>
-        </ul>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= posts.find(p => p.id === id)?.title || 'Blog Post' %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-teal-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/home" class="text-white text-2xl font-bold">myBlog</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="/home" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <% if(user==="admin"){ %>
+                        <a href="/admin" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <% } else { %>
+                        <a href="/profile/<%=user %>" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">My Profile</a>
+                    <% } %>
+                    <a href="/logout" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <main>
-      <% posts.forEach((posts)=>{ %>
-        <% if(posts.id===id){ %>
-      <div class="main-section">
-        <% if(!posts.thumbnail){var height="style=height:0"} %>
-        <div class="image-section" <%= height %> >
-          <a href="/thumbnails/<%= posts.thumbnail %>"> <img src="/thumbnails/<%= posts.thumbnail %>" alt="" /></a>
 
-        </div>
-        <div class="heading-section">
-          <h1><%= posts.title %></h1>
-        </div>
-        <div class="date-time-section">
-          <div>
-             <% var days=Math.round((date-posts.date)/86400000)
-                    if(days===0){
-                       days=Math.round((date-posts.date)/3600000)
-                       if(days===0){
-                        days=Math.round((date-posts.date)/60000)
-                        if(days===0){
-                            days="Just now"
-                        }else if(days===1){
-                            days="1 minute ago"
-                        }else{
-                            days=days+" minutes ago"
-                        }
-                       }else if(days===1){
-                        days="1 hour ago"
-                       }else{
-                        days=days+" hours ago"
-                       }
-                    }
-                    else if(days===1){
-                        days="1 day ago"
-                    }
-                    else{
-                        days=days+" days ago"
-                    } %>
-            <p>
-              <!-- 27/04/2020 &nbsp;•&nbsp; -->
-              <span> By</span><a href="/profile/<%=posts.author%>" class="username-text" ><%=posts.author%></a><span>Published </span> <%= days %> 
+    <!-- Main Content -->
+<!-- Main Content -->
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Post Content -->
+      <div class="lg:col-span-2 space-y-6">
+          <!-- Post Image -->
+          <% if(posts.find(p => p.id === id).thumbnail){ %>
+              <div class="rounded-2xl overflow-hidden shadow-lg">
+                  <img src="/thumbnails/<%= posts.find(p => p.id === id).thumbnail %>" 
+                       alt="<%= posts.find(p => p.id === id).title %>"
+                       class="w-full h-[500px] object-cover"
+                       onerror="this.src='images/default-image.png'">
+              </div>
+          <% } %>
 
-            </p>
-             
-               <% if(posts.author===user || user==="admin"){ %>
-                <p>
-               <a href="/update/<%= posts._id %>"><i class="fa-solid fa-pen"></i></a>
-              <a href="/delete/<%= posts._id %>"><i class="fa-solid fa-trash"></i></a>
-            </p>
-              <% }%>
-            
+          <!-- Post Content -->
+          <div class="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+              <h1 class="text-4xl font-bold text-gray-900"><%= posts.find(p => p.id === id).title %></h1>
+              
+              <!-- Post Meta -->
+              <div class="flex items-center justify-between py-4 border-y border-gray-200">
+                  <div class="flex items-center space-x-4">
+                      <% const currentPost = posts.find(p => p.id === id); %>
+                      <a href="/profile/<%= currentPost.author %>" class="text-teal-600 hover:text-teal-800 font-medium">
+                          <%= currentPost.author %>
+                      </a>
+                      <span class="text-gray-500">•</span>
+                      <% var days=Math.round((date-currentPost.date)/86400000)
+                          if(days===0){
+                              days=Math.round((date-currentPost.date)/3600000)
+                              if(days===0){
+                                  days=Math.round((date-currentPost.date)/60000)
+                                  if(days===0){
+                                      days="Just now"
+                                  }else if(days===1){
+                                      days="1 minute ago"
+                                  }else{
+                                      days=days+" minutes ago"
+                                  }
+                              }else if(days===1){
+                                  days="1 hour ago"
+                              }else{
+                                  days=days+" hours ago"
+                              }
+                          }
+                          else if(days===1){
+                              days="1 day ago"
+                          }
+                          else{
+                              days=days+" days ago"
+                          } %>
+                      <span class="text-gray-500"><%= days %></span>
+                  </div>
+
+                  <!-- Edit/Delete Buttons -->
+                  <% if(currentPost.author===user || user==="admin"){ %>
+                      <div class="flex items-center space-x-4">
+                          <a href="/update/<%= currentPost._id %>" class="text-teal-600 hover:text-teal-800">
+                              <i class="fa-solid fa-pen"></i>
+                          </a>
+                          <a href="/delete/<%= currentPost._id %>" class="text-red-600 hover:text-red-800">
+                              <i class="fa-solid fa-trash"></i>
+                          </a>
+                      </div>
+                  <% } %>
+              </div>
+
+              <!-- Post Content -->
+              <div class="prose max-w-none text-gray-700 leading-relaxed">
+                  <%= currentPost.content %>
+              </div>
           </div>
-          <% const red ="red" %>
-          <% const white ="whit" %>
-          <% var liked=0%>
-          
-
-          <p class="like-button" onclick="lcupdate()">
-            <button onclick="like(this)" class=" white 
-            <% if(posts.likedby.includes(user)){ liked=1%> 
-              <%= red %>
-              <% } %>" >
-            <i class="fa-sharp fa-solid fa-heart"></i></button> <span id="likecount"><%=posts.like%></span>  likes
-          </p>
-        </div>
-        <div class="content-section"><%= posts.content %></div>
       </div>
-      
 
-     <span id="likedcheck" style="display: none;"><%= liked %></span>
-
-
-      <% } }) %>
-
-      <div class="related-posts-section">
-        <% posts.reverse().forEach((posts)=>{ %>
-         <% if(posts.id!=id){ %>
-          <a href="/posts/<%=posts._id %>" class="related-card">
-          <img src="/thumbnails/<%= posts.thumbnail %>" onerror="this.onerror=null; this.src='/images/default-image.png'" alt="" />
-          <div>
-            <h1><%= posts.title %></h1>
-            <p><%= posts.author%></p>
+      <!-- Related Posts Section -->
+      <div class="lg:col-span-1 space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900">Related Posts</h2>
+          <div class="space-y-4">
+              <% const otherPosts = posts.filter(p => p.id !== id).slice(0, 5); %>
+              <% if(otherPosts.length > 0) { %>
+                  <% otherPosts.forEach(post => { %>
+                      <a href="/posts/<%= post._id %>" class="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-4">
+                          <div class="flex space-x-4">
+                              <img src="/thumbnails/<%= post.thumbnail %>" 
+                                   alt=""
+                                   class="w-24 h-24 rounded-lg object-cover"
+                                   onerror="this.src='images/default-image.png'">
+                              <div class="flex-1">
+                                  <h3 class="font-semibold text-gray-900 line-clamp-2"><%= post.title %></h3>
+                                  <p class="text-sm text-teal-600 mt-2">By <%= post.author %></p>
+                              </div>
+                          </div>
+                      </a>
+                  <% }); %>
+              <% } else { %>
+                  <p class="text-gray-500 text-center py-4">No related posts found</p>
+              <% } %>
           </div>
-      </a>
-        <% } }) %>
       </div>
-    </main>
-    <form action="" method="post" id="lcform" style="display: none;">
-      <input type="text" name="likecount" id="lc" onchange="this.form.submit()">
-      <input type="submit" id="submit">
+  </div>
+</main>
+
+    <!-- Hidden Form for Like Updates -->
+    <form action="" method="post" id="lcform" class="hidden">
+        <input type="text" name="likecount" id="lc">
+        <input type="submit" id="submit">
     </form>
 
     <script>
-      
-      var fcount
-      var likedstatus=parseInt(document.getElementById("likedcheck").innerHTML)
-      function like(x) {
-        x.classList.toggle("red");
-        var count=parseInt(document.getElementById("likecount").innerHTML)
-        if(likedstatus===0){
-        document.getElementById("likecount").innerHTML=count+1
-        fcount=parseInt(document.getElementById("likecount").innerHTML)
-        x.classList.add("white")
-        likedstatus=1
-        }
-        else{
-          document.getElementById("likecount").innerHTML=count-1
-          likedstatus=0
-        }
-        }
-       function lcupdate(){
-        document.getElementById("lc").value=fcount
-        document.getElementById("submit").click()
+        let likedstatus = <%= posts.find(p => p.id === id)?.likedby.includes(user) ? 1 : 0 %>;
+        let fcount;
 
-       }
+        function like(button) {
+            const count = parseInt(document.getElementById("likecount").innerHTML);
+            
+            if (likedstatus === 0) {
+                document.getElementById("likecount").innerHTML = count + 1;
+                button.classList.add("text-red-600");
+                likedstatus = 1;
+            } else {
+                document.getElementById("likecount").innerHTML = count - 1;
+                button.classList.remove("text-red-600");
+                likedstatus = 0;
+            }
+            
+            fcount = parseInt(document.getElementById("likecount").innerHTML);
+        }
+
+        function lcupdate() {
+            document.getElementById("lc").value = fcount;
+            document.getElementById("submit").click();
+        }
     </script>
-  </body>
+</body>
 </html>

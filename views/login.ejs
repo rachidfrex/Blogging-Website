@@ -2,88 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Login - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Add Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
-<body>
-    <main>
-        <div class="login-container">
-            <div class="login-col1">
-                <h1>myBlog</h1>
-                <img src="images/blog-vector-art.png" alt="">
-            </div>
-            <div class="login-col2">
-                <div id="register">
-                <p class="s-text">Already have an account ?
-                    <button class="s-btn" onclick="login()">Sign in</button>
-                </p>
-                <div class="reg-section">
-                    <h1>
-                        Welcome to myBlog!
-                    </h1>
-                    <h2>
-                        Register your account
-                    </h2>
-                </div>
-                <div class="form-container">
-                    <form action="/signup" method="post">
-                        <label>Name</label>
-                        <input type="text" name="name" required>
-                        <label>Email</label>
-                        <input type="email" name="email" required>
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                        <input type="submit" value="Register" class="lg-btn">
-
-                    </form>
-                </div>
-                </div>
-
-
-
-                <div id="login">
-                <p class="s-text">Don't have an account ?
-                    <button class="s-btn" onclick="register()">Sign Up</button>
-                </p>
-                <div class="reg-section ">
-                    <h1>
-                        Welcome to myBlog!
-                    </h1>
-                    <h2>
-                        Login to your account
-                    </h2>
-                </div>
-                <div class="form-container login-form">
-                    <form action="/login" method="post">
-                        <!-- <label>Name</label>
-                        <input type="text" > -->
-                        <label>Email</label>
-                        <input type="email" name="email"  required>
-                        <label>Password</label>
-                        <input type="password" name="password" required>
-                        <input type="submit" value="Login" class="lg-btn">
-
-                    </form>
-                </div>
-                </div>
+<body class="bg-gray-50 min-h-screen">
+    <div class="flex min-h-screen items-center justify-center">
+        <div class="w-full max-w-4xl flex bg-white rounded-2xl shadow-lg overflow-hidden">
+            <!-- Left Column -->
+            <div class="w-2/5 bg-teal-600 p-12 text-white">
+                <h1 class="text-4xl font-bold mb-6">myBlog</h1>
+                <img src="/images/blog-vector-art.png" alt="Blog" class="mt-8">
             </div>
 
-            
+            <!-- Right Column -->
+            <div class="w-3/5 p-12">
+                <!-- Login Form -->
+                <div id="login" class="space-y-6">
+                    <div class="text-right">
+                        <span class="text-sm text-gray-500">Don't have an account?</span>
+                        <button onclick="register()" class="ml-2 text-sm text-teal-600 hover:text-teal-800 font-semibold">Sign Up</button>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <h2 class="text-3xl font-bold text-gray-900">Welcome back!</h2>
+                        <p class="text-gray-600">Please login to your account</p>
+                    </div>
+
+                    <form action="/login" method="post" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <button type="submit" 
+                            class="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition duration-200">
+                            Login
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register" class="hidden space-y-6">
+                    <div class="text-right">
+                        <span class="text-sm text-gray-500">Already have an account?</span>
+                        <button onclick="login()" class="ml-2 text-sm text-teal-600 hover:text-teal-800 font-semibold">Sign In</button>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <h2 class="text-3xl font-bold text-gray-900">Create Account</h2>
+                        <p class="text-gray-600">Register your new account</p>
+                    </div>
+
+                    <form action="/signup" method="post" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" name="name" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <button type="submit" 
+                            class="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition duration-200">
+                            Register
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Add Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
+      function showToast(message, isError = true) {
+        Toastify({
+            text: `
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="${isError ? 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' : 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'}"/>
+                    </svg>
+                    ${message}
+                </div>`,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            escapeMarkup: false,
+            style: {
+                background: isError ? 
+                    "linear-gradient(to right, #ff4b4b, #ff416c)" : 
+                    "linear-gradient(to right, #00b09b, #96c93d)",
+                padding: "12px 24px",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                color: "white",
+                fontSize: "14px",
+                fontWeight: "500",
+            },
+            onClick: function(){} // Prevents duplicated toast on click
+        }).showToast();
+    }
+
+    // Show toast if there's an error message
+    <% if (locals.error) { %>
+        showToast("<%= error %>");
+    <% } %>
+
         function login(){
-            document.getElementById("register").style.display="none"
-             document.getElementById("login").style.display=""
-
+            document.getElementById("register").classList.add("hidden");
+            document.getElementById("login").classList.remove("hidden");
         }
+        
         function register(){
-            document.getElementById("register").style.display=""
-            document.getElementById("login").style.display="none"
-
-
+            document.getElementById("login").classList.add("hidden");
+            document.getElementById("register").classList.remove("hidden");
         }
     </script>
 </body>
