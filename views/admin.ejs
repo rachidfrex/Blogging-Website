@@ -6,6 +6,8 @@
     <title>Admin Dashboard - myBlog</title>
     <link rel="stylesheet" href="/css/styles.css">
     <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
@@ -88,160 +90,110 @@
                     </div>
                 </div>
 
-                             <!-- Posts Section -->
-              <div id="posts-section" class="bg-white rounded-lg shadow-lg p-6">
-                  <div class="flex justify-between items-center mb-6">
-                      <h2 class="text-xl font-semibold text-gray-900">Recent Articles</h2>
-                      <div class="flex space-x-4">
-                          <button onclick="deleteSelected()" 
-                                  id="delete-selected" 
-                                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors hidden">
-                              Delete Selected (<span id="selected-count">0</span>)
-                          </button>
-                      </div>
-                  </div>
-                  <div class="overflow-x-auto">
-                      <table class="min-w-full divide-y divide-gray-200">
-                          <thead>
-                              <tr class="bg-gray-50">
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                      <input type="checkbox" 
-                                             id="select-all"
-                                             class="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                                             onchange="toggleSelectAll(this)">
-                                  </th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                              </tr>
-                          </thead>
-                          <tbody class="bg-white divide-y divide-gray-200" id="posts-table-body">
-                              <!-- Table content will be dynamically populated -->
-                          </tbody>
-                      </table>
-                      
-                      <!-- Pagination -->
-                      <div class="flex items-center justify-between mt-6">
-                          <!-- ... existing pagination code ... -->
-                      </div>
-                  </div>
-              </div>
-              
-              <script>
-              const itemsPerPage = 12;
-              let currentPage = 1;
-              const allPosts = <%- JSON.stringify(posts.reverse()) %>;
-              let selectedPosts = new Set();
-              
-              function renderTable() {
-                  const tableBody = document.getElementById('posts-table-body');
-                  const start = (currentPage - 1) * itemsPerPage;
-                  const end = Math.min(start + itemsPerPage, allPosts.length);
-                  
-                  // Update showing text and pagination buttons
-                  document.getElementById('showing-start').textContent = start + 1;
-                  document.getElementById('showing-end').textContent = end;
-                  document.getElementById('prev-btn').disabled = currentPage === 1;
-                  document.getElementById('next-btn').disabled = end >= allPosts.length;
-                  
-                  // Render table rows
-                  tableBody.innerHTML = allPosts.slice(start, end).map((post, index) => `
-                      <tr class="hover:bg-gray-50 transition-colors">
-                          <td class="px-6 py-4 whitespace-nowrap">
-                              <input type="checkbox" 
-                                     value="${post._id}"
-                                     class="post-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                                     onchange="updateSelected(this)"
-                                     ${selectedPosts.has(post._id) ? 'checked' : ''}>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${start + index + 1}</td>
-                          <td class="px-6 py-4 whitespace-nowrap">
-                              <img src="/thumbnails/${post.thumbnail}" 
-                                   alt=""
-                                   class="h-16 w-24 object-cover rounded"
-                                   onerror="this.src='images/default-image.png'">
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap">
-                              <a href="/posts/${post._id}" class="text-gray-900 hover:text-teal-600">
-                                  ${post.title}
-                              </a>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap">
-                              <a href="/profile/${post.author}" class="text-gray-900 hover:text-teal-600">
-                                  ${post.author}
-                              </a>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                              <a href="/update/${post._id}" class="text-teal-600 hover:text-teal-800">
-                                  <i class="fa-solid fa-pen"></i>
-                              </a>
-                              <a href="/delete/${post._id}" class="text-red-600 hover:text-red-800">
-                                  <i class="fa-solid fa-trash"></i>
-                              </a>
-                          </td>
-                      </tr>
-                  `).join('');
-              }
-              
-              function updateSelected(checkbox) {
-                  if (checkbox.checked) {
-                      selectedPosts.add(checkbox.value);
-                  } else {
-                      selectedPosts.delete(checkbox.value);
-                  }
-                  updateDeleteButton();
-              }
-              
-              function toggleSelectAll(checkbox) {
-                  const checkboxes = document.querySelectorAll('.post-checkbox');
-                  checkboxes.forEach(box => {
-                      box.checked = checkbox.checked;
-                      if (checkbox.checked) {
-                          selectedPosts.add(box.value);
-                      } else {
-                          selectedPosts.delete(box.value);
-                      }
-                  });
-                  updateDeleteButton();
-              }
-              
-              function updateDeleteButton() {
-                  const deleteBtn = document.getElementById('delete-selected');
-                  const count = document.getElementById('selected-count');
-                  count.textContent = selectedPosts.size;
-                  deleteBtn.classList.toggle('hidden', selectedPosts.size === 0);
-              }
-              
-              async function deleteSelected() {
-                  if (confirm(`Are you sure you want to delete ${selectedPosts.size} posts?`)) {
-                      try {
-                          const response = await fetch('/delete-multiple', {
-                              method: 'POST',
-                              headers: {
-                                  'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({
-                                  postIds: Array.from(selectedPosts)
-                              })
-                          });
-                          
-                          if (response.ok) {
-                              window.location.reload();
-                          } else {
-                              alert('Error deleting posts');
-                          }
-                      } catch (err) {
-                          console.error('Error:', err);
-                          alert('Error deleting posts');
-                      }
-                  }
-              }
-              
-              // Initialize
-              renderTable();
-              </script>
+               <!-- Posts Section -->
+<div id="posts-section" class="bg-white rounded-lg shadow-lg p-6">
+  <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-gray-900">Recent Articles</h2>
+      <div class="flex space-x-4">
+          <button onclick="deleteSelected()" 
+                  id="delete-selected" 
+                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors hidden">
+              Delete Selected (<span id="selected-count">0</span>)
+          </button>
+      </div>
+  </div>
+  <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+          <thead>
+              <tr class="bg-gray-50">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <input type="checkbox" 
+                             id="select-all"
+                             class="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                             onchange="toggleSelectAll(this)">
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+              <% var i=0; %>
+              <% posts.slice().reverse().forEach((post) => { %>
+                  <tr class="hover:bg-gray-50 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                          <input type="checkbox" 
+                                 value="<%= post._id %>"
+                                 class="post-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                 onchange="updateSelected(this)">
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <%= ++i %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                          <img src="/thumbnails/<%= post.thumbnail %>" 
+                               alt=""
+                               class="h-16 w-24 object-cover rounded"
+                               onerror="this.src='/images/default-image.png'">
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                          <a href="/posts/<%= post._id %>" class="text-gray-900 hover:text-teal-600">
+                              <%= post.title %>
+                          </a>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                          <a href="/profile/<%= post.author %>" class="text-gray-900 hover:text-teal-600">
+                              <%= post.author %>
+                          </a>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                          <a href="/update/<%= post._id %>" class="text-teal-600 hover:text-teal-800">
+                              <i class="fa-solid fa-pen"></i>
+                          </a>
+                          <a href="/delete/<%= post._id %>" class="text-red-600 hover:text-red-800">
+                              <i class="fa-solid fa-trash"></i>
+                          </a>
+                      </td>
+                  </tr>
+              <% }); %>
+          </tbody>
+      </table>
+      <!-- Pagination Controls -->
+      <div class="flex items-center justify-between mt-6 px-4">
+        <div class="text-sm text-gray-700">
+            Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> of <span id="total-items">0</span> posts
+        </div>
+        <div class="flex space-x-2">
+            <button onclick="changePage(-1)" 
+                    id="prev-btn"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                Previous
+            </button>
+            <button onclick="changePage(1)" 
+                    id="next-btn"
+                    class="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-md hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                Next
+            </button>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <!-- Users Section -->
                 <div id="users-section" class="bg-white rounded-lg shadow-lg p-6 hidden">
                     <h2 class="text-xl font-semibold text-gray-900 mb-6">Users</h2>
@@ -291,6 +243,229 @@
 
         // Initialize
         showPosts();
-    </script>
+  
+let selectedPosts = new Set();
+
+function updateSelected(checkbox) {
+    if (checkbox.checked) {
+        selectedPosts.add(checkbox.value);
+    } else {
+        selectedPosts.delete(checkbox.value);
+    }
+    updateDeleteButton();
+}
+
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.post-checkbox');
+    checkboxes.forEach(box => {
+        box.checked = checkbox.checked;
+        if (checkbox.checked) {
+            selectedPosts.add(box.value);
+        } else {
+            selectedPosts.delete(box.value);
+        }
+    });
+    updateDeleteButton();
+}
+
+function updateDeleteButton() {
+    const deleteBtn = document.getElementById('delete-selected');
+    const count = document.getElementById('selected-count');
+    count.textContent = selectedPosts.size;
+    deleteBtn.classList.toggle('hidden', selectedPosts.size === 0);
+}
+
+async function deleteSelected() {
+    if (confirm(`Are you sure you want to delete ${selectedPosts.size} posts?`)) {
+        try {
+            const response = await fetch('/delete-multiple', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    postIds: Array.from(selectedPosts)
+                })
+            });
+            
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting posts');
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            alert('Error deleting posts');
+        }
+    }
+}
+
+function showToast(message, isSuccess = true) {
+    Toastify({
+        text: `
+            <div class="flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="${isSuccess ? 
+                        'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414L7.586 12l-1.293 1.293a1 1 0 101.414 1.414L9 13.414l1.293 1.293a1 1 0 001.414-1.414L10.414 12l1.293-1.293z' : 
+                        'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'}">
+                    </path>
+                </svg>
+                ${message}
+            </div>`,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        escapeMarkup: false,
+        style: {
+            background: isSuccess ? 
+                "linear-gradient(to right, #00b09b, #96c93d)" : 
+                "linear-gradient(to right, #ff4b4b, #ff416c)",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            color: "white",
+            fontSize: "14px",
+            fontWeight: "500",
+        },
+        onClick: function(){} // Prevents duplicated toast on click
+    }).showToast();
+}
+
+async function deleteSelected() {
+    if (selectedPosts.size === 0) {
+        showToast("Please select posts to delete", false);
+        return;
+    }
+
+    if (confirm(`Are you sure you want to delete ${selectedPosts.size} posts?`)) {
+        try {
+            const response = await fetch('/delete-multiple', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    postIds: Array.from(selectedPosts)
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showToast(`Successfully deleted ${selectedPosts.size} posts`, true);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast(data.message || 'Error deleting posts', false);
+            }
+        } catch (err) {
+            console.error('Error:', err);
+            showToast('Error deleting posts', false);
+        }
+    }
+}
+
+
+
+
+</script>
 </body>
 </html>
+
+<script>
+  let selectedPosts = new Set();
+  const postsPerPage = 12;
+  let currentPage = 1;
+  const allPosts = <%- JSON.stringify(posts.reverse()) %>;
+  
+  function renderTable() {
+      const tableBody = document.getElementById('posts-table-body');
+      const start = (currentPage - 1) * postsPerPage;
+      const end = Math.min(start + postsPerPage, allPosts.length);
+      
+      // Update pagination info
+      document.getElementById('showing-start').textContent = start + 1;
+      document.getElementById('showing-end').textContent = end;
+      document.getElementById('total-items').textContent = allPosts.length;
+      
+      // Update pagination buttons
+      document.getElementById('prev-btn').disabled = currentPage === 1;
+      document.getElementById('next-btn').disabled = end >= allPosts.length;
+      
+      // Clear and populate table
+      tableBody.innerHTML = allPosts.slice(start, end).map((post, index) => `
+          <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" 
+                         value="${post._id}"
+                         class="post-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                         onchange="updateSelected(this)"
+                         ${selectedPosts.has(post._id) ? 'checked' : ''}>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${start + index + 1}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <img src="/thumbnails/${post.thumbnail}" 
+                       alt=""
+                       class="h-16 w-24 object-cover rounded"
+                       onerror="this.src='/images/default-image.png'">
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <a href="/posts/${post._id}" class="text-gray-900 hover:text-teal-600">
+                      ${post.title}
+                  </a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                  <a href="/profile/${post.author}" class="text-gray-900 hover:text-teal-600">
+                      ${post.author}
+                  </a>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <a href="/update/${post._id}" class="text-teal-600 hover:text-teal-800">
+                      <i class="fa-solid fa-pen"></i>
+                  </a>
+                  <a href="/delete/${post._id}" class="text-red-600 hover:text-red-800">
+                      <i class="fa-solid fa-trash"></i>
+                  </a>
+              </td>
+          </tr>
+      `).join('');
+  }
+  
+  function changePage(delta) {
+      const maxPages = Math.ceil(allPosts.length / postsPerPage);
+      const newPage = currentPage + delta;
+      
+      if (newPage >= 1 && newPage <= maxPages) {
+          currentPage = newPage;
+          renderTable();
+      }
+  }
+  
+  // Keep existing functions
+  function updateSelected(checkbox) {
+      if (checkbox.checked) {
+          selectedPosts.add(checkbox.value);
+      } else {
+          selectedPosts.delete(checkbox.value);
+      }
+      updateDeleteButton();
+  }
+  
+  function toggleSelectAll(checkbox) {
+      const checkboxes = document.querySelectorAll('.post-checkbox');
+      checkboxes.forEach(box => {
+          box.checked = checkbox.checked;
+          if (checkbox.checked) {
+              selectedPosts.add(box.value);
+          } else {
+              selectedPosts.delete(box.value);
+          }
+      });
+      updateDeleteButton();
+  }
+  
+  // Initialize table
+  renderTable();
+  </script>

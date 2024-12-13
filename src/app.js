@@ -320,7 +320,35 @@ app.get("/delete/:custom", (req, res) => {
 }
 });
 
+app.post("/delete-multiple", async (req, res) => {
+  if (req.session.type === "admin") {
+      try {
+          const { postIds } = req.body;
+          
+          // Check if postIds is an array
+          if (!Array.isArray(postIds) || postIds.length === 0) {
+              return res.status(400).json({ 
+                  success: false, 
+                  message: "No posts selected" 
+              });
+          }
 
+          await PosT.deleteMany({ _id: { $in: postIds } });
+          res.json({ success: true });
+      } catch (err) {
+          console.error("Delete error:", err);
+          res.status(500).json({ 
+              success: false, 
+              message: "Error deleting posts" 
+          });
+      }
+  } else {
+      res.status(403).json({ 
+          success: false, 
+          message: "Unauthorized" 
+      });
+  }
+});
 app.get("/profile/:customRoute", (req, res) => {
 
   if(req.session.username){
