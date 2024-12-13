@@ -43,7 +43,36 @@ const visitSchema = new mongoose.Schema({
 });
 
 const visits = mongoose.model("visits", visitSchema);
+async function createAdminIfNotExists() {
+  try {
+    const adminExists = await Profile.findOne({ email: "admin@admin.com" });
+    
+    if (!adminExists) {
+      const adminProfile = {
+        username: "admin",
+        email: "admin@admin.com",
+        password: "admin",
+        type: "admin",
+        fullname: "Administrator",
+        dp: "",
+        bio: "Site Administrator",
+        weblink: "",
+        facebook: "",
+        whatsapp: "",
+        twitter: "",
+        instagram: "",
+        phoneno: "",
+      };
 
+      await Profile.create(adminProfile);
+      console.log("Admin account created successfully");
+    }
+  } catch (err) {
+    console.error("Error creating admin account:", err);
+  }
+}
+
+createAdminIfNotExists();
 app.get("/home", async (req, res) => {
   if (req.session.useremail) {
     try {
@@ -170,30 +199,16 @@ app.post("/compose", upload.single("image"), async (req, res) => {
 // });
 app.get("/posts/:custom", (req, res) => {
   if(req.session.username){
-    PosT.find().exec((err, allPosts) => {
+    PosT.find((err, results) => {
       if (err) {
         console.error(err);
-        return res.render("error", { error: "Error loading posts" });
+        return res.render("error", { error: "Error loading post" });
       }
-      
-      // Find the current post
-      const currentPost = allPosts.find(p => p._id == req.params.custom);
-      
-      if (!currentPost) {
-        return res.render("notfound");
-      }
-
-      // Get related posts (excluding current post)
-      const relatedPosts = allPosts
-        .filter(p => p._id != req.params.custom)
-        .slice(0, 5); // Get only 5 related posts
-
       res.render("posts", {
         user: req.session.username,
-        currentPost: currentPost,
-        relatedPosts: relatedPosts,
+        posts: results,
         date: Date.now(),
-        id: req.params.custom
+        id: req.params.custom,
       });
     });
   } else {
@@ -467,6 +482,11 @@ app.get("/:custom/:custom2",(req,res)=>{
   res.render("notfound")
 })
 
+// Add this at the end of your routes in src/app.js
+app.use((req, res) => {
+  // Catch all unmatched routes
+  res.status(404).render('notfound');
+});
 app.listen(process.env.PORT || 3000, () => {
   console.log("server started at port 3000");
 });

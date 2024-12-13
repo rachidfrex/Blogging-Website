@@ -33,7 +33,6 @@
 
     <!-- Main Content -->
 <!-- Main Content -->
-<!-- Main Content -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Main Post Content -->
@@ -44,13 +43,23 @@
                   <img src="/thumbnails/<%= posts.find(p => p.id === id).thumbnail %>" 
                        alt="<%= posts.find(p => p.id === id).title %>"
                        class="w-full h-[500px] object-cover"
-                       onerror="this.src='images/default-image.png'">
+                       onerror="this.src='/images/default-image.png'">
               </div>
           <% } %>
 
           <!-- Post Content -->
           <div class="bg-white rounded-2xl shadow-lg p-8 space-y-6">
               <h1 class="text-4xl font-bold text-gray-900"><%= posts.find(p => p.id === id).title %></h1>
+
+               <!-- Like Button -->
+    <div class="flex items-center space-x-2">
+      <button onclick="like(this); lcupdate();" 
+              class="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition-colors duration-200 <%= posts.find(p => p.id === id).likedby.includes(user) ? 'text-red-600' : '' %>">
+          <i class="fa-solid fa-heart text-xl"></i>
+          <span id="likecount" class="font-medium"><%= posts.find(p => p.id === id).like %></span>
+          <span class="text-sm">likes</span>
+      </button>
+  </div>
               
               <!-- Post Meta -->
               <div class="flex items-center justify-between py-4 border-y border-gray-200">
@@ -108,30 +117,32 @@
       </div>
 
       <!-- Related Posts Section -->
-      <div class="lg:col-span-1 space-y-6">
-          <h2 class="text-2xl font-bold text-gray-900">Related Posts</h2>
-          <div class="space-y-4">
-              <% const otherPosts = posts.filter(p => p.id !== id).slice(0, 5); %>
-              <% if(otherPosts.length > 0) { %>
-                  <% otherPosts.forEach(post => { %>
-                      <a href="/posts/<%= post._id %>" class="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-4">
-                          <div class="flex space-x-4">
-                              <img src="/thumbnails/<%= post.thumbnail %>" 
-                                   alt=""
-                                   class="w-24 h-24 rounded-lg object-cover"
-                                   onerror="this.src='images/default-image.png'">
-                              <div class="flex-1">
-                                  <h3 class="font-semibold text-gray-900 line-clamp-2"><%= post.title %></h3>
-                                  <p class="text-sm text-teal-600 mt-2">By <%= post.author %></p>
-                              </div>
-                          </div>
-                      </a>
-                  <% }); %>
-              <% } else { %>
-                  <p class="text-gray-500 text-center py-4">No related posts found</p>
-              <% } %>
-          </div>
-      </div>
+     <!-- Related Posts Section -->
+<div class="lg:col-span-1 space-y-6">
+  <h2 class="text-2xl font-bold text-gray-900">Related Posts</h2>
+  <div class="space-y-4">
+      <% const otherPosts = posts.filter(p => p.id !== id).slice(0, 5); %>
+      <% if(otherPosts.length > 0) { %>
+          <% otherPosts.forEach(post => { %>
+              <a href="/posts/<%= post._id %>" class="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-4">
+                  <div class="flex space-x-4">
+                      <img src="/thumbnails/<%= post.thumbnail %>" 
+                           alt=""
+                           class="w-24 h-24 rounded-lg object-cover"
+                           onerror="this.src='/images/default-image.png'">
+                      <div class="flex-1">
+                          <h3 class="font-semibold text-gray-900 line-clamp-2"><%= post.title %></h3>
+                          <p class="text-sm text-gray-600 mt-1 line-clamp-2"><%= post.content %></p>
+                          <p class="text-sm text-teal-600 mt-2">By <%= post.author %></p>
+                      </div>
+                  </div>
+              </a>
+          <% }); %>
+      <% } else { %>
+          <p class="text-gray-500 text-center py-4">No related posts found</p>
+      <% } %>
+  </div>
+</div>
   </div>
 </main>
 

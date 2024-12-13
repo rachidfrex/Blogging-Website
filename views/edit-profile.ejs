@@ -2,50 +2,194 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="/css/edit-profile-style.css">
+    <title>Edit Profile - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
 </head>
-<body>
-    <main>
-        <div class="edit-container">
-            <h1>Edit profile</h1>
-            <form action="" method="post" class="forms-container" enctype="multipart/form-data">
-                <div>
-                    <label for="">Username</label>
-                    <input type="text" readonly value="<%=username%>">
-                    <label for="">Full Name</label>
-                    <input type="text" name="fullname" value="<%=userdata.fullname%>">
-                    <label for="">E-mail</label>
-                    <input type="text" readonly value="<%=email%>">
-                    <label for="">Bio</label>
-                    <textarea id="" cols="30" rows="10" name="bio"><%=userdata.bio%></textarea>
-                    <label for="">Profile Picture</label>
-                    <input type="file" class="custom-file-input" name="image">
-                 </div>
+<body class="bg-gray-50">
+    <main class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg">
+            <!-- Header -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-900">Edit Profile</h1>
+                <p class="mt-1 text-sm text-gray-600">Update your personal information and social media links</p>
+            </div>
 
-                <div>
-                    <label for="">Website Link</label>
-                    <input type="text" name="weblink"  value="<%=userdata.weblink%>">
-                    <label for="">Facbook Profile </label>
-                    <input type="text" name="fb"  value="<%=userdata.facebook%>">
-                    <label for="">Instagram Profile</label>
-                    <input type="text" name="insta" value="<%=userdata.instagram%>">
-                    <label for="">Twitter Profile</label>
-                    <input type="text" name="tw" value="<%=userdata.twitter%>">
-                    <label for="">Whatsapp Number</label>
-                    <input type="text" name="wa" value="<%=userdata.whatsapp%>">
-                    <label for="">Phone Number</label>
-                    <input type="text" name="phno" value="<%=userdata.phoneno%>">
-                    <div class="buttons">
-                        <input type="reset" value="Discard">
-                        <input type="submit" value="save">
+            <!-- Form -->
+            <form action="" method="post" class="p-8" enctype="multipart/form-data">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Left Column - Personal Info -->
+                    <div class="space-y-6">
+                        <!-- Profile Picture -->
+                       <!-- Profile Picture -->
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+    <div class="flex items-center space-x-4">
+        <div class="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
+            <img id="preview-image" 
+                 src="/thumbnails/<%= userdata.dp %>" 
+                 alt="Profile picture"
+                 class="w-full h-full object-cover"
+                 onerror="this.src='/images/default-image.png'">
+        </div>
+        <div class="flex-1">
+            <input type="file" 
+                   name="image"
+                   id="image-input"
+                   accept="image/*"
+                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                   onchange="previewImage(this)"/>
+        </div>
+    </div>
+</div>
+
+<!-- Add this script at the bottom of the body tag -->
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('preview-image');
+    const file = input.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            
+            // Add fade-in animation
+            preview.style.opacity = '0';
+            preview.style.transition = 'opacity 0.3s ease-in-out';
+            setTimeout(() => {
+                preview.style.opacity = '1';
+            }, 100);
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '/images/default-image.png';
+    }
+}
+</script>
+
+                        <!-- Username -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" 
+                                   readonly 
+                                   value="<%=username%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500">
+                        </div>
+
+                        <!-- Full Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" 
+                                   name="fullname" 
+                                   value="<%=userdata.fullname%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="text" 
+                                   readonly 
+                                   value="<%=email%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-500">
+                        </div>
+
+                        <!-- Bio -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                            <textarea name="bio" 
+                                      rows="4" 
+                                      class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"><%=userdata.bio%></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Social Links -->
+                    <div class="space-y-6">
+                        <!-- Website -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-globe mr-2"></i>Website
+                            </label>
+                            <input type="text" 
+                                   name="weblink" 
+                                   value="<%=userdata.weblink%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- Facebook -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-facebook mr-2"></i>Facebook
+                            </label>
+                            <input type="text" 
+                                   name="fb" 
+                                   value="<%=userdata.facebook%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- Instagram -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-instagram mr-2"></i>Instagram
+                            </label>
+                            <input type="text" 
+                                   name="insta" 
+                                   value="<%=userdata.instagram%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- Twitter -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-twitter mr-2"></i>Twitter
+                            </label>
+                            <input type="text" 
+                                   name="tw" 
+                                   value="<%=userdata.twitter%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- WhatsApp -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                            </label>
+                            <input type="text" 
+                                   name="wa" 
+                                   value="<%=userdata.whatsapp%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-phone mr-2"></i>Phone Number
+                            </label>
+                            <input type="text" 
+                                   name="phno" 
+                                   value="<%=userdata.phoneno%>"
+                                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                        </div>
                     </div>
                 </div>
-        </form>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-gray-200 flex justify-end space-x-4">
+                    <button type="reset" 
+                            class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200">
+                        Reset Changes
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors duration-200">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
     </main>
-    
 </body>
 </html>

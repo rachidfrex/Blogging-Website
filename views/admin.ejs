@@ -1,141 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin</title>
-    <link rel="stylesheet" href="/css/admin-style.css" />
-    <script
-      src="https://kit.fontawesome.com/eabac940d1.js"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body onload="posts()">
-    <nav>
-      <div class="logo">myBlog</div>
-      <div class="nav-items">
-        <ul>
-          <!-- <li><a href=""> Home</a></li>
-          <li><a href="">Dashboard</a></li> -->
-          <li>
-            <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-          </li>
-        </ul>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/home" class="text-2xl font-bold text-teal-600">myBlog</a>
+                </div>
+                <div class="flex items-center">
+                    <a href="/logout" class="inline-flex items-center px-4 py-2 text-sm font-medium text-teal-600 hover:text-teal-800">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <main>
-      <div class="controls-container">
-        <p class="d-board-text">Dashboard</p>
-        <div class="controls">
-            <button onclick="posts()" id="posts-btn"><i class="fa-solid fa-newspaper"></i> Manage Posts</button>
-            <button onclick="user()" id="user-btn"><i class="fa-solid fa-user"></i> Manage Users</button>
-        </div>
-      </div>
-      <div class="content-container">
-        <div class="stats-container">
-            <div class="stat-box">
-                <div>
-                <h1><%=visits[0].visits%></h1>
-                <h2>Total Visits</h2>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex gap-8">
+            <!-- Sidebar -->
+            <div class="w-64 flex-shrink-0">
+                <div class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Dashboard</h2>
+                    <div class="space-y-2">
+                        <button onclick="showPosts()" 
+                                id="posts-btn"
+                                class="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                                >
+                            <i class="fa-solid fa-newspaper mr-3"></i>
+                            Manage Posts
+                        </button>
+                        <button onclick="showUsers()" 
+                                id="users-btn"
+                                class="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                                >
+                            <i class="fa-solid fa-users mr-3"></i>
+                            Manage Users
+                        </button>
+                    </div>
                 </div>
-                <p><i class="fa-solid fa-eye"></i></p>
             </div>
-            <div class="stat-box">
-                <div>
-                <h1><%=  posts.length %></h1>
-                <h2>Total Posts</h2>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Total Visits -->
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm opacity-80">Total Visits</p>
+                                <h3 class="text-3xl font-bold"><%=visits[0].visits%></h3>
+                            </div>
+                            <i class="fa-solid fa-eye text-4xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <!-- Total Posts -->
+                    <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm opacity-80">Total Posts</p>
+                                <h3 class="text-3xl font-bold"><%= posts.length %></h3>
+                            </div>
+                            <i class="fa-solid fa-newspaper text-4xl opacity-80"></i>
+                        </div>
+                    </div>
+
+                    <!-- Total Users -->
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm opacity-80">Total Users</p>
+                                <h3 class="text-3xl font-bold"><%=profiles.length-1 %></h3>
+                            </div>
+                            <i class="fa-solid fa-users text-4xl opacity-80"></i>
+                        </div>
+                    </div>
                 </div>
-                <p><i class="fa-solid fa-newspaper"></i></p>
-            </div>
-            <div class="stat-box">
-                <div>
-                <h1><%=profiles.length-1 %></h1>
-                <h2>Total Users</h2>
+
+                             <!-- Posts Section -->
+              <div id="posts-section" class="bg-white rounded-lg shadow-lg p-6">
+                  <div class="flex justify-between items-center mb-6">
+                      <h2 class="text-xl font-semibold text-gray-900">Recent Articles</h2>
+                      <div class="flex space-x-4">
+                          <button onclick="deleteSelected()" 
+                                  id="delete-selected" 
+                                  class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors hidden">
+                              Delete Selected (<span id="selected-count">0</span>)
+                          </button>
+                      </div>
+                  </div>
+                  <div class="overflow-x-auto">
+                      <table class="min-w-full divide-y divide-gray-200">
+                          <thead>
+                              <tr class="bg-gray-50">
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                      <input type="checkbox" 
+                                             id="select-all"
+                                             class="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                             onchange="toggleSelectAll(this)">
+                                  </th>
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody class="bg-white divide-y divide-gray-200" id="posts-table-body">
+                              <!-- Table content will be dynamically populated -->
+                          </tbody>
+                      </table>
+                      
+                      <!-- Pagination -->
+                      <div class="flex items-center justify-between mt-6">
+                          <!-- ... existing pagination code ... -->
+                      </div>
+                  </div>
+              </div>
+              
+              <script>
+              const itemsPerPage = 12;
+              let currentPage = 1;
+              const allPosts = <%- JSON.stringify(posts.reverse()) %>;
+              let selectedPosts = new Set();
+              
+              function renderTable() {
+                  const tableBody = document.getElementById('posts-table-body');
+                  const start = (currentPage - 1) * itemsPerPage;
+                  const end = Math.min(start + itemsPerPage, allPosts.length);
+                  
+                  // Update showing text and pagination buttons
+                  document.getElementById('showing-start').textContent = start + 1;
+                  document.getElementById('showing-end').textContent = end;
+                  document.getElementById('prev-btn').disabled = currentPage === 1;
+                  document.getElementById('next-btn').disabled = end >= allPosts.length;
+                  
+                  // Render table rows
+                  tableBody.innerHTML = allPosts.slice(start, end).map((post, index) => `
+                      <tr class="hover:bg-gray-50 transition-colors">
+                          <td class="px-6 py-4 whitespace-nowrap">
+                              <input type="checkbox" 
+                                     value="${post._id}"
+                                     class="post-checkbox rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                     onchange="updateSelected(this)"
+                                     ${selectedPosts.has(post._id) ? 'checked' : ''}>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${start + index + 1}</td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                              <img src="/thumbnails/${post.thumbnail}" 
+                                   alt=""
+                                   class="h-16 w-24 object-cover rounded"
+                                   onerror="this.src='images/default-image.png'">
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                              <a href="/posts/${post._id}" class="text-gray-900 hover:text-teal-600">
+                                  ${post.title}
+                              </a>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap">
+                              <a href="/profile/${post.author}" class="text-gray-900 hover:text-teal-600">
+                                  ${post.author}
+                              </a>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                              <a href="/update/${post._id}" class="text-teal-600 hover:text-teal-800">
+                                  <i class="fa-solid fa-pen"></i>
+                              </a>
+                              <a href="/delete/${post._id}" class="text-red-600 hover:text-red-800">
+                                  <i class="fa-solid fa-trash"></i>
+                              </a>
+                          </td>
+                      </tr>
+                  `).join('');
+              }
+              
+              function updateSelected(checkbox) {
+                  if (checkbox.checked) {
+                      selectedPosts.add(checkbox.value);
+                  } else {
+                      selectedPosts.delete(checkbox.value);
+                  }
+                  updateDeleteButton();
+              }
+              
+              function toggleSelectAll(checkbox) {
+                  const checkboxes = document.querySelectorAll('.post-checkbox');
+                  checkboxes.forEach(box => {
+                      box.checked = checkbox.checked;
+                      if (checkbox.checked) {
+                          selectedPosts.add(box.value);
+                      } else {
+                          selectedPosts.delete(box.value);
+                      }
+                  });
+                  updateDeleteButton();
+              }
+              
+              function updateDeleteButton() {
+                  const deleteBtn = document.getElementById('delete-selected');
+                  const count = document.getElementById('selected-count');
+                  count.textContent = selectedPosts.size;
+                  deleteBtn.classList.toggle('hidden', selectedPosts.size === 0);
+              }
+              
+              async function deleteSelected() {
+                  if (confirm(`Are you sure you want to delete ${selectedPosts.size} posts?`)) {
+                      try {
+                          const response = await fetch('/delete-multiple', {
+                              method: 'POST',
+                              headers: {
+                                  'Content-Type': 'application/json'
+                              },
+                              body: JSON.stringify({
+                                  postIds: Array.from(selectedPosts)
+                              })
+                          });
+                          
+                          if (response.ok) {
+                              window.location.reload();
+                          } else {
+                              alert('Error deleting posts');
+                          }
+                      } catch (err) {
+                          console.error('Error:', err);
+                          alert('Error deleting posts');
+                      }
+                  }
+              }
+              
+              // Initialize
+              renderTable();
+              </script>
+                <!-- Users Section -->
+                <div id="users-section" class="bg-white rounded-lg shadow-lg p-6 hidden">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Users</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <% profiles.forEach((profile)=>{ %>
+                            <% if(profile.type != "admin") { %>
+                                <div class="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+                                    <a href="/profile/<%= profile.username %>" class="block">
+                                        <img src="/thumbnails/<%= profile.dp %>" 
+                                             alt=""
+                                             class="w-full h-48 object-cover rounded-t-lg"
+                                             onerror="this.src='images/user-icon.png'">
+                                        <div class="p-4">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-lg font-medium text-gray-900"><%= profile.fullname %></h3>
+                                                <a href="/removeuser/<%= profile._id %>?user=<%= profile.username %>" 
+                                                   class="text-red-600 hover:text-red-800">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            </div>
+                                            <p class="text-sm text-gray-500 mt-1">@<%= profile.username %></p>
+                                        </div>
+                                    </a>
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
                 </div>
-                <p><i class="fa-solid fa-user"></i></p>
-            </div>
-           
-        </div>
-
-        <div class="posts-container" id="posts">
-            <h1>Recent Articles</h1>
-            <div class="posts" id="style-2">
-                <table>
-                    <tr>
-                        <th>No</th>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                    
-                    <% var i=0 %>
-                     <% posts.reverse().forEach((posts)=>{ %>
-                    <tr>
-                        <td><%= ++i %></td>
-                        <td><a href="/thumbnails/<%=posts.thumbnail%>"><img src="/thumbnails/<%=posts.thumbnail %>" alt="" onerror="this.onerror=null; this.src='images/default-image.png'"></a></td>
-                        <td><a href="/posts/<%=posts._id%>"class="author-name"><p><%= posts.title %></p></a></td>
-                        <td><a href="/profile/<%=posts.author %>" class="author-name"><%= posts.author %></a></td>
-                        <td><a href="/update/<%=posts._id%>" class="edit-tbn">Edit</a></td>
-                        <td><a href="/delete/<%=posts._id%>" class="delete-btn">Delete</a></td>
-                    </tr>
-                    <% }) %>
-                    
-                    
-                </table>
             </div>
         </div>
-        
+    </div>
 
-        <div class="user-container"  id="user">
-          <h1>Users</h1>
-          <div class="users" id="style-2">
-
-            <% profiles.forEach((profiles)=>{ %>
-              <%if(profiles.type!="admin") {%>
-              <div class="user">
-              <a href="/profile/<%=profiles.username %>" class="profile-link">
-              <div class="image-container">
-                <div>
-                <img src="/thumbnails/<%=profiles.dp%>" alt="" onerror="this.onerror=null; this.src='images/user-icon.png'">
-              </div>
-              </div>
-              <div class="username">
-              <h1><%= profiles.fullname %></h1>
-              <p><a href="/removeuser/<%=profiles._id%>?user=<%=profiles.username%>"><i class="fa-solid fa-trash"></i></a></p>
-              </div>
-            </a>
-            </div>
-            <% } }) %>
-
-            
-          </div>
-        </div>
-      </div>
-    </main>
     <script>
-      function user(){
-        document.getElementById("posts").style.display="none";
-        document.getElementById("user").style.display="block";
-        document.getElementById("user-btn").style.backgroundColor="var(--uiclr)";
-        document.getElementById("posts-btn").style.backgroundColor="";
-        document.getElementById("user-btn").classList.add("selected");
-        document.getElementById("posts-btn").classList.remove("selected");
+        function showPosts() {
+            document.getElementById('posts-section').classList.remove('hidden');
+            document.getElementById('users-section').classList.add('hidden');
+            document.getElementById('posts-btn').classList.add('bg-teal-50', 'text-teal-700');
+            document.getElementById('users-btn').classList.remove('bg-teal-50', 'text-teal-700');
+        }
 
-        
-        
-      }
-      function posts(){
-         document.getElementById("user").style.display="none";
-        document.getElementById("posts").style.display="block";
-        document.getElementById("posts-btn").style.backgroundColor="var(--uiclr)";
-        document.getElementById("user-btn").style.backgroundColor="";
-        document.getElementById("posts-btn").classList.add("selected");
-        document.getElementById("user-btn").classList.remove("selected");
+        function showUsers() {
+            document.getElementById('posts-section').classList.add('hidden');
+            document.getElementById('users-section').classList.remove('hidden');
+            document.getElementById('users-btn').classList.add('bg-teal-50', 'text-teal-700');
+            document.getElementById('posts-btn').classList.remove('bg-teal-50', 'text-teal-700');
+        }
 
-      }
+        // Initialize
+        showPosts();
     </script>
-  </body>
+</body>
 </html>
