@@ -1,6 +1,6 @@
 # Modern Blog Website
 
-A responsive and feature-rich blogging platform built with React and Firebase, offering a seamless experience for content creators and readers alike.
+A responsive and feature-rich blogging platform built with Node.js, Express, and MongoDB, offering a seamless experience for content creators and readers alike.
 
 <img src="projectImage\home-page.png">
 ## Features
@@ -26,18 +26,14 @@ A responsive and feature-rich blogging platform built with React and Firebase, o
    npm install
    ```
 
-3. **Firebase Configuration**
-   - Create a new Firebase project
-   - Enable Authentication and Firestore
+3. **MongoDB Configuration**
+   - Create a MongoDB Atlas account or use local MongoDB
    - Create a `.env` file in the root directory
-   - Add your Firebase configuration:
+   - Add your MongoDB configuration:
      ```
-     REACT_APP_FIREBASE_API_KEY=your_api_key
-     REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
-     REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-     REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-     REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-     REACT_APP_FIREBASE_APP_ID=your_app_id
+     MONGODB_URI=your_mongodb_connection_string
+     PORT=3000
+     JWT_SECRET=your_jwt_secret
      ```
 
 4. **Start the server**
@@ -56,20 +52,13 @@ Blogging-Website/
 │   │   ├── auth.js
 │   │   ├── blog.js
 │   │   └── profile.js
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── blogController.js
-│   │   └── profileController.js
 │   ├── models/
-│   │   ├── User.js
-│   │   ├── Blog.js
-│   │   └── Comment.js
+│   │   ├── profiledb.js
+│   │   └── postdb.js
 │   ├── middleware/
 │   │   └── auth.js
-│   ├── config/
-│   │   └── firebase.js
-│   └── utils/
-│       └── helpers.js
+│   └── config/
+│       └── db.js
 ├── projectImage/
 ├── package.json
 └── README.md
@@ -77,11 +66,13 @@ Blogging-Website/
 
 ## Technologies Used
 
-- React.js
-- Firebase (Authentication, Firestore, Storage)
-- React Router Dom
-- CSS Modules
-- Context API
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+- Express Router
+- RESTful APIs
 
 ## Contributing
 
