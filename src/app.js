@@ -157,10 +157,13 @@ app.post("/categories", async (req, res) => {
         description: req.body.description
       });
       await newCategory.save();
-      res.redirect("/categories");
+      res.redirect("/categories"); // Make sure this matches your categories list route
     } catch (err) {
+      console.error("Error creating category:", err);
       res.status(500).render("error", { error: "Error creating category" });
     }
+  } else {
+    res.redirect("/");
   }
 });
 

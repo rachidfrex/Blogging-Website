@@ -274,11 +274,35 @@ document.addEventListener('click', (e) => {
         <% } %>
     </div>
 </div>
-      
+    
 
          <!-- Recent Articles Section -->
     <div>
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Recent Articles</h2>
+          <!-- Add category filter -->
+        <div class="mb-8">
+            <div class="flex items-center space-x-4"></div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterByCategory('')" 
+                            class="px-4 py-2 rounded-full text-sm font-medium bg-teal-100 text-teal-800 hover:bg-teal-200 transition-colors">
+                        All
+                    </button>
+                    <% if (locals.categories && locals.categories.length > 0) { %>
+                        <% categories.forEach(function(category, index) { %>
+                            <button onclick="filterByCategory('<%= category._id %>')" 
+                                    class="px-4 py-2 rounded-full text-sm font-medium 
+                                           <%= index % 3 === 0 ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' : 
+                                              index % 3 === 1 ? 'bg-purple-100 text-purple-800 hover:bg-purple-200' : 
+                                                              'bg-pink-100 text-pink-800 hover:bg-pink-200' %> 
+                                           transition-colors">
+                                <%= category.name %>
+                            </button>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
         <div id="posts-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <% posts.reverse().slice(0, 6).forEach((posts)=>{ %>
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden post-card" data-categories="<%= (posts.categories || []).map(cat => cat._id).join(',') %>">
@@ -318,13 +342,13 @@ document.addEventListener('click', (e) => {
                                 <% if (posts.categories && posts.categories.length > 0) { %>
                                     <% posts.categories.forEach(function(cat, index) { %>
                                         <% if (index === 0) { %>
-                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl bg-green-200 text-green-500"><%= cat.name %></span>
+                                            <span class="text-sm px-[10px] py-[1px]  rounded-3xl bg-green-100 text-green-600 font-semibold"><%= cat.name %></span>
                                         <% } else if (index === 1) { %>
-                                            <span class=" text-sm px-[7px] py-[1px]  rounded-3xl bg-yellow-200 text-yellow-500"><%= cat.name %></span>
+                                            <span class=" text-sm px-[10px] py-[1px]  rounded-3xl bg-yellow-100 text-yellow-600 font-semibold"><%= cat.name %></span>
                                         <% } else if (index === 2) { %>
-                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl bg-red-200 text-red-500"><%= cat.name %></span>
+                                            <span class="text-sm px-[10px] py-[1px]  rounded-3xl bg-red-200 text-red-600 font-semibold"><%= cat.name %></span>
                                         <% } else { %>
-                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl"><%= cat.name %></span>
+                                            <span class="text-sm px-[10px] py-[1px] font-semibold rounded-3xl"><%= cat.name %></span>
                                         <% } %>
                                     <% }); %>
                                 <% } %>
@@ -360,17 +384,7 @@ document.addEventListener('click', (e) => {
         </div>
     </div>
       
-        <!-- Add category filter -->
-        <div class="category-filter">
-            <select id="categoryFilter" onchange="filterByCategory(this.value)">
-                <option value="">All Categories</option>
-                <% if (locals.categories && locals.categories.length > 0) { %>
-                    <% categories.forEach(function(category) { %>
-                        <option value="<%= category._id %>"><%= category.name %></option>
-                    <% }); %>
-                <% } %>
-            </select>
-        </div>
+        
         
     </main>
 
