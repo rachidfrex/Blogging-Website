@@ -92,14 +92,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <h3 align="center"> Login section</h3>
 <img src="projectImage\login.png">
 <h3 align="center"> Home Page</h3>
-<img src="SH2.jpg">
+<img src="projectImage\home-page.png">
 <h3 align="center"> Post View</h3>
-<img src="SH1.jpg">
+<img src="projectImage\post.png">
 <h3 align="center"> Profile Section</h3>
-<img src="SH3.jpg">
+<img src="projectImage\profile.png">
 <h3 align="center"> Admin Dashboard </h3>
-
-![image](https://github.com/arjuncvinod/Blogging-Website/assets/68469520/4c9f0f3c-3ac7-43e9-9854-d671f237c795)
+<img src="projectImage\dashboard.png">
 
 <h3  align="center" > Don't forget to hit the :star: if you like this repo. </h3>
-<h1 align="center"> Made with ❤️ by <a href="https://arjuncvinod.github.io">Arjun</a> </h1>
+
