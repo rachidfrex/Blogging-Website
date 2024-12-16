@@ -2,8 +2,7 @@
 
 A responsive and feature-rich blogging platform built with React and Firebase, offering a seamless experience for content creators and readers alike.
 
-![Project Preview](./projectImage/project-preview.png)
-
+<img src="projectImage\home-page.png">
 ## Features
 
 - 🔐 User authentication (Sign up, Sign in, Sign out)
@@ -18,7 +17,7 @@ A responsive and feature-rich blogging platform built with React and Firebase, o
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Blogging-Website.git
+   git clone https://github.com/rachidfrex/Blogging-Website.git
    cd Blogging-Website
    ```
 
@@ -41,9 +40,9 @@ A responsive and feature-rich blogging platform built with React and Firebase, o
      REACT_APP_FIREBASE_APP_ID=your_app_id
      ```
 
-4. **Start the development server**
+4. **Start the server**
    ```bash
-   npm start
+   node src/app.js
    ```
 
 ## Project Structure
@@ -52,16 +51,25 @@ A responsive and feature-rich blogging platform built with React and Firebase, o
 Blogging-Website/
 ├── public/
 ├── src/
-│   ├── components/
-│   │   ├── Auth/
-│   │   ├── Blog/
-│   │   ├── Common/
-│   │   └── Profile/
-│   ├── pages/
-│   ├── context/
-│   ├── hooks/
-│   ├── firebase/
-│   └── styles/
+│   ├── app.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── blog.js
+│   │   └── profile.js
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── blogController.js
+│   │   └── profileController.js
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Blog.js
+│   │   └── Comment.js
+│   ├── middleware/
+│   │   └── auth.js
+│   ├── config/
+│   │   └── firebase.js
+│   └── utils/
+│       └── helpers.js
 ├── projectImage/
 ├── package.json
 └── README.md
