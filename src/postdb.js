@@ -18,10 +18,15 @@ const postSchema = new mongoose.Schema({
     thumbnail:String,
     date:Number,
     like:Number,
-    likedby:[String]
-    });
+    likedby:[String],
+    categories: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'category'
+        }],
+        default: []  // Initialize as empty array by default
+    }
+});
   
-    
-
 const PosT = mongoose.model("post", postSchema);
 module.exports = PosT

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Category - myBlog</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://kit.fontawesome.com/eabac940d1.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-teal-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/home" class="text-white text-2xl font-bold">myBlog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Back to Dashboard</a>
+                    <a href="/categories" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">View All Categories</a>
+                    <a href="/logout" class="text-white hover:bg-teal-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h1 class="text-2xl font-bold text-gray-900">Create New Category</h1>
+                <p class="mt-1 text-sm text-gray-600">Add a new category for blog posts</p>
+            </div>
+
+            <form action="/categories" method="POST" class="p-8 space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Category Name</label>
+                    <input type="text" 
+                           name="name" 
+                           required
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                           placeholder="Enter category name">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" 
+                              rows="4"
+                              class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                              placeholder="Describe the category"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6">
+                    <a href="/admin" 
+                       class="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors">
+                        Create Category
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Existing Categories List -->
+        <div class="mt-8 bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Existing Categories</h2>
+            </div>
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach(function(category) { %>
+                            <div class="border rounded-lg p-4">
+                                <h3 class="font-medium text-gray-900"><%= category.name %></h3>
+                                <p class="text-sm text-gray-500 mt-1"><%= category.description %></p>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-gray-500 col-span-3 text-center">No categories found</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

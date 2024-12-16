@@ -7,6 +7,7 @@ const sessions = require("express-session");
 // const collection = require("./mongodb");
 const PosT = require("./postdb");
 const Profile = require("./profiledb");
+const Category = require("./models/categorydb");
 // const conn = require("./connection")
 let imagename
 const multer = require("multer");
@@ -36,7 +37,6 @@ app.use(
     resave: false,
   })
 );
-
 
 const visitSchema = new mongoose.Schema({
   visits: Number
@@ -73,17 +73,119 @@ async function createAdminIfNotExists() {
 }
 
 createAdminIfNotExists();
+
+// Middleware to fetch categories for all routes
+app.use(async (req, res, next) => {
+  try {
+    res.locals.categories = await Category.find().lean();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Category Routes - Note the order is important!
+// 1. New Category Page (most specific)
+// app.get("/categories/new", async (req, res) => {
+//   if (req.session.type === "admin") {
+//     try {
+//       const categories = await Category.find().lean();
+//       res.render("categories-new", { 
+//         user: req.session.username,
+//         categories: categories
+//       });
+//     } catch (err) {
+//       res.status(500).render("error", { error: "Error loading categories" });
+//     }
+//   } else {
+//     res.redirect("/");
+//   }
+//   });
+app.get("/categories/new", async (req, res) => {
+  console.log("Session type:", req.session.type);
+  if (req.session.type === "admin") {
+      try {
+          const categories = await Category.find().lean();
+          console.log("Found categories:", categories);
+          res.render("categories-new", { 
+              user: req.session.username,
+              categories: categories
+          });
+      } catch (err) {
+          console.error("Category error:", err);
+          res.status(500).render("error", { error: "Error loading categories" });
+      }
+  } else {
+      res.redirect("/");
+  }
+});
+// 2. Delete Category
+app.get("/categories/delete/:id", async (req, res) => {
+  if (req.session.type === "admin") {
+    try {
+      await Category.findByIdAndDelete(req.params.id);
+      res.redirect("/categories");
+    } catch (err) {
+      res.status(500).render("error", { error: "Error deleting category" });
+    }
+  }
+});
+
+// 3. List Categories
+app.get("/categories", async (req, res) => {
+  if (req.session.type === "admin") {
+    try {
+      const categories = await Category.find().lean();
+      res.render("categories", { 
+        categories, 
+        user: req.session.username 
+      });
+    } catch (err) {
+      res.status(500).render("error", { error: "Error loading categories" });
+    }
+  } else {
+    res.redirect("/");
+  }
+});
+
+// 4. Create Category
+app.post("/categories", async (req, res) => {
+  if (req.session.type === "admin") {
+    try {
+      const newCategory = new Category({
+        name: req.body.name,
+        description: req.body.description
+      });
+      await newCategory.save();
+      res.redirect("/categories");
+    } catch (err) {
+      res.status(500).render("error", { error: "Error creating category" });
+    }
+  }
+});
+
 app.get("/home", async (req, res) => {
   if (req.session.useremail) {
     try {
-      const posts = await PosT.find().exec();
-      const sortedPosts = await PosT.find().sort({ like: "desc" }).exec();
+      const [posts, sortedPosts] = await Promise.all([
+        PosT.find().populate('categories').lean(),
+        PosT.find().sort({ like: "desc" }).populate('categories').lean()
+      ]);
+
+      // Initialize empty categories array if undefined
+      posts.forEach(post => {
+        if (!post.categories) post.categories = [];
+      });
+      
+      sortedPosts.forEach(post => {
+        if (!post.categories) post.categories = [];
+      });
 
       res.render("home", {
         user: req.session.username,
         posts: posts,
         date: Date.now(),
-        sposts: sortedPosts,
+        sposts: sortedPosts
       });
     } catch (err) {
       console.log(err);
@@ -165,11 +267,27 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/compose", (req, res) => {
-  if(req.session.username){
-  res.render("compose", { user: req.session.username });
+app.get("/compose", async (req, res) => {
+  if(!req.session.username) {
+    return res.redirect("/");
+  }
+  
+  try {
+    const categories = await Category.find().lean();
+    res.render("compose", { 
+      user: req.session.username,
+      categories: categories || [] // Ensure categories is always defined
+    });
+  } catch (err) {
+    console.error("Error loading categories:", err);
+    res.render("compose", {
+      user: req.session.username,
+      categories: [],
+      error: "Error loading categories"
+    });
   }
 });
+
 app.post("/compose", upload.single("image"), async (req, res) => {
   const postData = {
     author: req.session.username,
@@ -178,6 +296,7 @@ app.post("/compose", upload.single("image"), async (req, res) => {
     thumbnail: imagename,
     date: Date.now(),
     like: 0,
+    categories: req.body.categories || []
   };
   await PosT.insertMany(postData);
   res.redirect("/home");
@@ -197,24 +316,85 @@ app.post("/compose", upload.single("image"), async (req, res) => {
 //   res.render("notfound")
 // }
 // });
-app.get("/posts/:custom", (req, res) => {
-  if(req.session.username){
-    PosT.find((err, results) => {
-      if (err) {
-        console.error(err);
-        return res.render("error", { error: "Error loading post" });
-      }
-      res.render("posts", {
-        user: req.session.username,
-        posts: results,
-        date: Date.now(),
-        id: req.params.custom,
-      });
+// app.get("/posts/:custom", async (req, res) => {
+//   if (!req.session.username) {
+//     return res.render("notfound");
+//   }
+
+//   try {
+//     // Find the specific post and populate its categories
+//     const currentPost = await PosT.findById(req.params.custom).populate('categories').lean();
+    
+//     if (!currentPost) {
+//       return res.render("notfound");
+//     }
+
+//     // Get related posts with similar categories
+//     const relatedPosts = await PosT.find({
+//       _id: { $ne: currentPost._id }, // Exclude current post
+//       categories: { $in: currentPost.categories || [] } // Find posts with similar categories
+//     })
+//     .populate('categories')
+//     .limit(5)
+//     .lean();
+
+//     // Initialize arrays if undefined
+//     currentPost.likedby = currentPost.likedby || [];
+//     currentPost.categories = currentPost.categories || [];
+
+//     res.render("posts", {
+//       user: req.session.username,
+//       currentPost: currentPost,
+//       posts: relatedPosts, // Keep this for backward compatibility
+//       date: Date.now(),
+//       id: req.params.custom
+//     });
+//   } catch (err) {
+//     console.error("Error loading post:", err);
+//     res.render("error", { error: "Error loading post" });
+//   }
+// });
+
+app.get("/posts/:custom", async (req, res) => {
+  if (!req.session.username) {
+    return res.render("notfound");
+  }
+
+  try {
+    // Find the specific post and populate its categories
+    const currentPost = await PosT.findById(req.params.custom).populate('categories').lean();
+    
+    if (!currentPost) {
+      return res.render("notfound");
+    }
+
+    // Get related posts with similar categories
+    const relatedPosts = await PosT.find({
+      _id: { $ne: currentPost._id }, // Exclude current post
+      categories: { $in: currentPost.categories || [] } // Find posts with similar categories
+    })
+    .populate('categories')
+    .limit(5)
+    .lean();
+
+    // Initialize arrays if undefined
+    currentPost.likedby = currentPost.likedby || [];
+    currentPost.categories = currentPost.categories || [];
+
+    // Pass the data to the template
+    res.render("posts", {
+      user: req.session.username,
+      currentPost: currentPost,
+      posts: relatedPosts,
+      date: Date.now(),
+      id: req.params.custom
     });
-  } else {
-    res.render("notfound");
+  } catch (err) {
+    console.error("Error loading post:", err);
+    res.render("error", { error: "Error loading post" });
   }
 });
+
 app.post("/posts/:custom", (req, res) => {
   const id = req.params.custom;
   var userid = req.session.username;
@@ -266,33 +446,63 @@ app.post("/posts/:custom", (req, res) => {
   });
 });
 
-app.get("/update/:custom",(req,res)=>{
-   if(req.session.username){
-  PosT.findById(req.params.custom,(err,result)=>{
-    console.log(result);
-     if(req.session.username===result.author||req.session.username==="admin"){
-    res.render("edit-post",{user:req.session.username,post:result})
-     }else{
-      res.render("notfound")
-     }
-  })
-}
-})
-app.post("/update/:custom", upload.single("image"), async (req, res) => {
-  PosT.findByIdAndUpdate(
-    req.params.custom,
-    {
-      title:req.body.postTitle,
-      content: req.body.postBody,
-      thumbnail: imagename,
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      }
+app.get("/update/:custom", async (req, res) => {
+  if (!req.session.username) {
+    return res.redirect("/");
+  }
+
+  try {
+    const [post, categories] = await Promise.all([
+      PosT.findById(req.params.custom).populate('categories').lean(),
+      Category.find().lean()
+    ]);
+
+    if (!post) {
+      return res.render("notfound");
     }
-  );
-  res.redirect("/posts/" + req.params.custom);
+
+    if (req.session.username === post.author || req.session.username === "admin") {
+      res.render("edit-post", {
+        user: req.session.username,
+        post: post,
+        categories: categories || [] // Ensure categories is always defined
+      });
+    } else {
+      res.render("notfound");
+    }
+  } catch (err) {
+    console.error("Error in /update/:custom:", err);
+    res.render("error", { error: "Error loading post" });
+  }
+});
+
+// Update the POST route to handle categories
+app.post('/update/:custom', upload.single('thumbnail'), async (req, res) => {
+  try {
+    const post = await PosT.findById(req.params.custom);
+    if (!post) {
+      return res.status(404).send('Post not found');
+    }
+
+    // Keep existing thumbnail if no new one is uploaded
+    const thumbnail = req.file ? req.file.filename : post.thumbnail;
+
+    const updatedPost = await PosT.findByIdAndUpdate(
+      req.params.custom,
+      {
+        title: req.body.postTitle,
+        content: req.body.postBody,
+        thumbnail: thumbnail,  // Use either new or existing thumbnail
+        categories: req.body.categories || []
+      },
+      { new: true }
+    );
+
+    res.redirect('/posts/' + updatedPost._id);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating post');
+  }
 });
 
 app.get("/delete/:custom", (req, res) => {
@@ -349,40 +559,28 @@ app.post("/delete-multiple", async (req, res) => {
       });
   }
 });
-app.get("/profile/:customRoute", (req, res) => {
-
+app.get("/profile/:customRoute", async (req, res) => {
   if(req.session.username){
-  const customRoute = req.params.customRoute;
-// Profile.findOne({username:req.session.username},(err,result)=>{
-//   if(err){
-//     console.log(err);
-//   }else{
-//   console.log(result.dp); 
-//   }
-// })
+    try {
+      const [userPosts, userProfile, categories] = await Promise.all([
+        PosT.find({ author: req.params.customRoute }).populate('categories').lean(),
+        Profile.findOne({ username: req.params.customRoute }).lean(),
+        Category.find().lean()
+      ]);
 
-  PosT.find({ author: customRoute}, (err, result)=> {
-    if (err){
-        console.log(err);
-        
+      res.render("profile", {
+        username: req.session.username,
+        posts: userPosts,
+        categories: categories,
+        userdata: userProfile,
+        date: Date.now(),
+      });
+    } catch (err) {
+      console.error(err);
+      res.render("error", { error: "Error loading profile" });
     }
-    else{
-        req.session.userposts=result;
-        Profile.findOne({username:customRoute},(err,results)=>{
-          res.render("profile", {
-          username: req.session.username,
-          posts: req.session.userposts,
-          userdata:results,
-          date: Date.now(),
-        });
-        // console.log(results);
-        })
-        
-        
-    }})
-    // console.log(req.session.userposts);
-  }else{
-    res.redirect("/")
+  } else {
+    res.redirect("/");
   }
 });
 
@@ -434,22 +632,31 @@ app.post("/editprofile/:custom",upload.single("image"), async (req, res) => {
   res.redirect("/profile/"+custom);
 });
 
-app.get("/admin",(req,res)=>{
-  if(req.session.type==="admin"){
-  // collection.find((err,logins)=>{
-    Profile.find((err,profiles)=>{
-      PosT.find((err,posts)=>{
-        visits.find((err,visits)=>{
-         res.render("admin",{profiles:profiles,posts:posts,visits:visits,username:req.session.username});
-        })
-      })
-    })
-  }else{
-    res.redirect("/")
+app.get("/admin", async (req, res) => {
+  if(req.session.type === "admin"){
+    try {
+      const [profiles, posts, visitStats, categories] = await Promise.all([
+        Profile.find().lean(),
+        PosT.find().populate('categories').lean(),
+        visits.find().lean(),
+        Category.find().lean()
+      ]);
+
+      res.render("admin", {
+        profiles: profiles,
+        posts: posts,
+        visits: visitStats,
+        categories: categories, // Make sure categories is passed
+        username: req.session.username
+      });
+    } catch (err) {
+      console.error(err);
+      res.render("error", { error: "Error loading admin dashboard" });
+    }
+  } else {
+    res.redirect("/");
   }
-  // })
- 
-})
+});
 
 app.get("/removeuser/:custom", (req, res) => {
   if(req.session.type==="admin"){
@@ -506,15 +713,16 @@ app.get('/test', (req, res) => {
   res.send('Test route is working!');
 });
 
-app.get("/:custom/:custom2",(req,res)=>{
-  res.render("notfound")
-})
+// Move these catch-all routes to the very end
+app.get("/:custom/:custom2", (req, res) => {
+  res.render("notfound");
+});
 
-// Add this at the end of your routes in src/app.js
+// This should be the very last route
 app.use((req, res) => {
-  // Catch all unmatched routes
   res.status(404).render('notfound');
 });
+
 app.listen(process.env.PORT || 3000, () => {
   console.log("server started at port 3000");
 });

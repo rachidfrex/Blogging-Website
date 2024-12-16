@@ -1,6 +1,6 @@
 # Modern Blog Website
 
-A responsive and feature-rich blogging platform built with Node.js, Express, and MongoDB, offering a seamless experience for content creators and readers alike.
+A responsive and feature-rich blogging platform built with React and Firebase, offering a seamless experience for content creators and readers alike.
 
 <img src="projectImage\home-page.png">
 ## Features
@@ -26,19 +26,23 @@ A responsive and feature-rich blogging platform built with Node.js, Express, and
    npm install
    ```
 
-3. **MongoDB Configuration**
-   - Create a MongoDB Atlas account or use local MongoDB
+3. **Firebase Configuration**
+   - Create a new Firebase project
+   - Enable Authentication and Firestore
    - Create a `.env` file in the root directory
-   - Add your MongoDB configuration:
+   - Add your Firebase configuration:
      ```
-     MONGODB_URI=your_mongodb_connection_string
-     PORT=3000
-     JWT_SECRET=your_jwt_secret
+     REACT_APP_FIREBASE_API_KEY=your_api_key
+     REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+     REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+     REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+     REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+     REACT_APP_FIREBASE_APP_ID=your_app_id
      ```
 
-4. **Start the server**
+4. **Start the development server**
    ```bash
-   node src/app.js
+   npm start
    ```
 
 ## Project Structure
@@ -47,18 +51,16 @@ A responsive and feature-rich blogging platform built with Node.js, Express, and
 Blogging-Website/
 ├── public/
 ├── src/
-│   ├── app.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── blog.js
-│   │   └── profile.js
-│   ├── models/
-│   │   ├── profiledb.js
-│   │   └── postdb.js
-│   ├── middleware/
-│   │   └── auth.js
-│   └── config/
-│       └── db.js
+│   ├── components/
+│   │   ├── Auth/
+│   │   ├── Blog/
+│   │   ├── Common/
+│   │   └── Profile/
+│   ├── pages/
+│   ├── context/
+│   ├── hooks/
+│   ├── firebase/
+│   └── styles/
 ├── projectImage/
 ├── package.json
 └── README.md
@@ -66,13 +68,11 @@ Blogging-Website/
 
 ## Technologies Used
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT Authentication
-- Express Router
-- RESTful APIs
+- React.js
+- Firebase (Authentication, Firestore, Storage)
+- React Router Dom
+- CSS Modules
+- Context API
 
 ## Contributing
 

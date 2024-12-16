@@ -281,7 +281,7 @@ document.addEventListener('click', (e) => {
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Recent Articles</h2>
         <div id="posts-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <% posts.reverse().slice(0, 6).forEach((posts)=>{ %>
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden post-card" data-categories="<%= (posts.categories || []).map(cat => cat._id).join(',') %>">
                     <a href="/posts/<%= posts._id %>" class="block">
                         <img src="thumbnails/<%= posts.thumbnail %>" 
                             alt="" 
@@ -310,13 +310,30 @@ document.addEventListener('click', (e) => {
                                     days="1 day ago"
                                 }
                                 else{
-                                    days=days+" days ago"
+                                    days=" days ago"
                                 } %>
+                           <div class="flex justify-between  items-center">
                             <p class="text-sm text-gray-500 mb-2"><%= days %></p>
+                            <div class="post-categories flex gap-2 justify-center items-center">
+                                <% if (posts.categories && posts.categories.length > 0) { %>
+                                    <% posts.categories.forEach(function(cat, index) { %>
+                                        <% if (index === 0) { %>
+                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl bg-green-200 text-green-500"><%= cat.name %></span>
+                                        <% } else if (index === 1) { %>
+                                            <span class=" text-sm px-[7px] py-[1px]  rounded-3xl bg-yellow-200 text-yellow-500"><%= cat.name %></span>
+                                        <% } else if (index === 2) { %>
+                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl bg-red-200 text-red-500"><%= cat.name %></span>
+                                        <% } else { %>
+                                            <span class="text-sm px-[7px] py-[1px]  rounded-3xl"><%= cat.name %></span>
+                                        <% } %>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+                           </div>
                             <h3 class="text-lg font-semibold text-gray-900 mb-2" title="<%= posts.title %>">
                                 <%= posts.title %>
                             </h3>
-                            <p class="text-gray-600 text-sm line-clamp-3 mb-4">
+                            <p class="text-gray-600 text-sm line-clamp-2 mb-4">
                                 <%= posts.content %>
                             </p>
                             <div class="flex justify-between items-center">
@@ -325,6 +342,7 @@ document.addEventListener('click', (e) => {
                                     Read More
                                 </button>
                             </div>
+                          
                         </div>
                     </a>
                 </div>
@@ -342,6 +360,17 @@ document.addEventListener('click', (e) => {
         </div>
     </div>
       
+        <!-- Add category filter -->
+        <div class="category-filter">
+            <select id="categoryFilter" onchange="filterByCategory(this.value)">
+                <option value="">All Categories</option>
+                <% if (locals.categories && locals.categories.length > 0) { %>
+                    <% categories.forEach(function(category) { %>
+                        <option value="<%= category._id %>"><%= category.name %></option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
         
     </main>
 
@@ -414,7 +443,7 @@ document.addEventListener('click', (e) => {
                 const timeString = formatTimeAgo(post.date);
     
                 const postHTML = `
-                    <div class="bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in post-card" data-categories="${(post.categories || []).map(cat => cat._id).join(',')}">
                         <a href="/posts/${post._id}" class="block">
                             <img src="thumbnails/${post.thumbnail}" 
                                 alt="" 
@@ -429,6 +458,9 @@ document.addEventListener('click', (e) => {
                                     <button class="px-4 py-2 text-sm bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors">
                                         Read More
                                     </button>
+                                </div>
+                                <div class="post-categories">
+                                    ${post.categories && post.categories.length > 0 ? post.categories.map(cat => `<span class="category-tag">${cat.name}</span>`).join('') : ''}
                                 </div>
                             </div>
                         </a>
@@ -491,6 +523,36 @@ document.addEventListener('click', (e) => {
             if (diff < 172800) return "1 day ago";
             return `${Math.floor(diff / 86400)} days ago`;
         }
+
+        function filterByCategory(categoryId) {
+            const posts = document.querySelectorAll('.post-card');
+            posts.forEach(post => {
+                if (!categoryId || post.dataset.categories.includes(categoryId)) {
+                    post.style.display = 'block';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+        }
     </script>
+    <style>
+        .category-tag {
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        
+        .category-filter {
+            margin: 20px 0;
+        }
+        
+        .category-filter select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
 </body>
 </html>

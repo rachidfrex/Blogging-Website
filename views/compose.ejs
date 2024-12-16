@@ -83,6 +83,38 @@
                               placeholder="Write your post content here..."></textarea>
                 </div>
 
+                <!-- Categories Input -->
+                <div class="form-group">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-gray-700">Categories</label>
+                        <% if (user === "admin") { %>
+                            <a href="/categories/new" 
+                               class="inline-flex items-center px-3 py-1 text-sm font-medium text-teal-600 bg-teal-50 rounded-md hover:bg-teal-100">
+                                <i class="fas fa-plus mr-1"></i>
+                                New Category
+                            </a>
+                        <% } %>
+                    </div>
+                    <div class="category-checkboxes mt-2">
+                        <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+                            <% categories.forEach(function(category) { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           name="categories[]" 
+                                           value="<%= category._id %>"
+                                           id="category<%= category._id %>">
+                                    <label class="form-check-label" for="category<%= category._id %>">
+                                        <%= category.name %>
+                                    </label>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p class="text-gray-500 text-sm">No categories available</p>
+                        <% } %>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
                     <button type="reset" 
@@ -97,6 +129,25 @@
             </form>
         </div>
     </main>
+
+    <style>
+    .category-checkboxes {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 10px 0;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .form-check-input {
+        margin: 0;
+    }
+    </style>
 
     <script>
     function previewImage(input) {
