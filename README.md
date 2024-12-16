@@ -90,7 +90,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Screenshots**: 
 
 <h3 align="center"> Login section</h3>
-<img src="SH4.jpg">
+<img src="projectImage\login.png">
 <h3 align="center"> Home Page</h3>
 <img src="SH2.jpg">
 <h3 align="center"> Post View</h3>
