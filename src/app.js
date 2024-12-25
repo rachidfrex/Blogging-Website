@@ -86,17 +86,16 @@ const visits = mongoose.model("visits", visitSchema);
 
 async function initializeDatabase() {
   try {
-    // Create visits counter if it doesn't exist
-    const visitsCount = await visits.findOne({ _id: "640cb99cd1ab2ecb248598b4" });
+    // 1. Create visits counter
+    const visitsCount = await visits.findOne();
     if (!visitsCount) {
       await visits.create({
-        _id: "640cb99cd1ab2ecb248598b4",
         visits: 0
       });
-      console.log("Visits counter initialized");
+      console.log("✓ Visits counter initialized");
     }
 
-    // Create admin account if it doesn't exist
+    // 2. Create admin account first
     const adminExists = await Profile.findOne({ email: "admin@admin.com" });
     if (!adminExists) {
       const adminProfile = {
@@ -112,12 +111,75 @@ async function initializeDatabase() {
         whatsapp: "",
         twitter: "",
         instagram: "",
-        phoneno: "",
+        phoneno: ""
       };
 
       await Profile.create(adminProfile);
-      console.log("Admin account created successfully");
+      console.log("✓ Admin account created successfully");
     }
+
+    // 3. Create default posts
+    const postsCount = await PosT.countDocuments();
+    if (postsCount === 0) {
+      const defaultPosts = [
+        {
+          title: "Cyberpunk 2077: Night City's Neon Revolution",
+          content: "Dive into the stunning world of Night City in Cyberpunk 2077...",
+          author: "admin",
+          thumbnail: "cyberpunk-2077.jpg",
+          date: Date.now(),
+          like: 0,
+          likedby: [],
+          categories: []
+        },
+        {
+            title: "Doctor Strange: Master of the Mystic Arts",
+            content: "Explore the mystical journey of Dr. Stephen Strange from brilliant neurosurgeon to Master of the Mystic Arts. Through ancient spells and dimensional travel, Strange protects our reality from supernatural threats. The character's evolution in the MCU has shown us incredible magical battles and mind-bending visual effects, making him one of Marvel's most fascinating characters.",
+            author: "admin",
+            thumbnail: "doc-strange.jpg",
+            date: Date.now(),
+            like: 0,
+            likedby: [],
+            categories: []
+        },
+        {
+            title: "Iron Man: Legacy of Tony Stark",
+            content: "Tony Stark's journey from genius billionaire to Earth's greatest defender has captivated audiences worldwide. Through innovative technology and sheer determination, Iron Man became the cornerstone of the Avengers. His sacrifice to save the universe showcases that even the most self-centered person can become the greatest hero.",
+            author: "admin",
+            thumbnail: "ironman.jpg",
+            date: Date.now(),
+            like: 0,
+            likedby: [],
+            categories: []
+          },
+          {
+            title: "Home Fitness Revolution",
+            content: "Transform your living space into a personal gym with these effective home workout techniques. Learn how to maintain fitness without expensive equipment. From bodyweight exercises to simple cardio routines, discover how to stay healthy and active within your home environment. Including nutrition tips and daily workout schedules.",
+            author: "admin",
+            thumbnail: "homefitness.jpg",
+            date: Date.now(),
+            like: 0,
+            likedby: [],
+            categories: []
+          },
+          {
+            title: "Wanda Maximoff: The Scarlet Witch",
+            content: "Delve into the tragic and powerful story of Wanda Maximoff, the Scarlet Witch. From her origins as a HYDRA experiment to becoming one of the most powerful beings in the Marvel universe, Wanda's journey is filled with love, loss, and incredible displays of reality-altering power. Her story in WandaVision shows the depths of grief and the extent of her abilities.",
+            author: "admin",
+            thumbnail: "wanda.jpg",
+            date: Date.now(),
+            like: 0,
+            likedby: [],
+            categories: []
+          }
+
+       
+      ];
+
+      await PosT.insertMany(defaultPosts);
+      console.log("✓ Default posts created successfully");
+    }
+
   } catch (err) {
     console.error("Database initialization error:", err);
   }
@@ -127,81 +189,15 @@ async function initializeDatabase() {
 initializeDatabase();
 
 
-async function initializeDatabase() {
-  try {
-    // Initialize default posts
-    const defaultPosts = [
-      {
-        title: "Cyberpunk 2077: Night City's Neon Revolution",
-        content: "Dive into the stunning world of Night City in Cyberpunk 2077. This groundbreaking RPG from CD Projekt Red combines stunning visuals with deep storytelling. Experience the life of V, a mercenary navigating through a world of corporate intrigue, advanced technology, and street warfare. With Keanu Reeves as Johnny Silverhand, the game offers an unforgettable journey into a dystopian future.",
-        author: "admin",
-        thumbnail: "cyberpunk-2077.jpg",
-        date: Date.now(),
-        like: 0,
-        likedby: [],
-        categories: []
-      },
-      {
-        title: "Doctor Strange: Master of the Mystic Arts",
-        content: "Explore the mystical journey of Dr. Stephen Strange from brilliant neurosurgeon to Master of the Mystic Arts. Through ancient spells and dimensional travel, Strange protects our reality from supernatural threats. The character's evolution in the MCU has shown us incredible magical battles and mind-bending visual effects, making him one of Marvel's most fascinating characters.",
-        author: "admin",
-        thumbnail: "doc-strange.jpg",
-        date: Date.now(),
-        like: 0,
-        likedby: [],
-        categories: []
-      },
-      {
-        title: "Iron Man: Legacy of Tony Stark",
-        content: "Tony Stark's journey from genius billionaire to Earth's greatest defender has captivated audiences worldwide. Through innovative technology and sheer determination, Iron Man became the cornerstone of the Avengers. His sacrifice to save the universe showcases that even the most self-centered person can become the greatest hero.",
-        author: "admin",
-        thumbnail: "ironman.jpg",
-        date: Date.now(),
-        like: 0,
-        likedby: [],
-        categories: []
-      },
-      {
-        title: "Home Fitness Revolution",
-        content: "Transform your living space into a personal gym with these effective home workout techniques. Learn how to maintain fitness without expensive equipment. From bodyweight exercises to simple cardio routines, discover how to stay healthy and active within your home environment. Including nutrition tips and daily workout schedules.",
-        author: "admin",
-        thumbnail: "homefitness.jpg",
-        date: Date.now(),
-        like: 0,
-        likedby: [],
-        categories: []
-      },
-      {
-        title: "Wanda Maximoff: The Scarlet Witch",
-        content: "Delve into the tragic and powerful story of Wanda Maximoff, the Scarlet Witch. From her origins as a HYDRA experiment to becoming one of the most powerful beings in the Marvel universe, Wanda's journey is filled with love, loss, and incredible displays of reality-altering power. Her story in WandaVision shows the depths of grief and the extent of her abilities.",
-        author: "admin",
-        thumbnail: "wanda.jpg",
-        date: Date.now(),
-        like: 0,
-        likedby: [],
-        categories: []
-      }
-    ];
-
-    // Check if posts already exist
-    const postsCount = await PosT.countDocuments();
-    if (postsCount === 0) {
-      await PosT.insertMany(defaultPosts);
-      console.log("Default posts created successfully");
-    }
-
-
-  } catch (err) {
-    console.error("Database initialization error:", err);
-  }
-}
-
 mongoose.connect("mongodb://127.0.0.1:27017/myblog", {
   useNewUrlParser: true,
   useUnifiedTopology: true
-}).then(() => {
+}).then(async () => {
   console.log("Database connected");
-  initializeDatabase();
+  await initializeDatabase(); // Wait for initialization to complete
+  console.log("Database initialization completed");
+}).catch(err => {
+  console.error("Database connection error:", err);
 });
 
 
